@@ -3,8 +3,8 @@
 exports.config = {
     chromeDriver: './support/chromedriver', // relative path to node-webkit's chromedriver
     chromeOnly: true, // starting Selenium server isn't required in our case
-    specs: ['test/e2e/**/*.js'],
-    baseUrl: 'file:///absolute/path/to/your/project/index.html',
+    specs: ['tests/e2e/*.js'],
+    baseUrl: 'file://' + __dirname + '/dist/example/basic-usage.html', // build:examples needs to be run before
     rootElement: 'html', // specify a correct element where you bootstrap your AngularJS app, 'body' by default
 
     onPrepare: function() {
