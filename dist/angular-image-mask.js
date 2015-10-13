@@ -23,7 +23,7 @@ aim.directive('tjlImageMask', function() {
 		scope: {
 			image: '=src'
 		},
-		templateUrl: 'template/image-mask.part.html'
+		template: 'template/image-mask.part.html'
 	};
 
 	return ret;
