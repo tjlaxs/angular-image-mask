@@ -1,0 +1,35 @@
+{
+	"author": "Tero Laxström <tero.laxstrom@visit.fi>",
+	"name": "angular-image-mask",
+	"description": "angular-image-mask - An AngularJS directive to draw paths and masks over an image",
+	"version": "0.0.0",
+	"homepage": "https://github.com/tjlaxs/angular-image-mask",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tjlaxs/angular-image-mask"
+	},
+	"keywords": [
+		"angularjs",
+		"image",
+		"mask",
+		"path",
+		"line"
+		],
+	"license": "MIT",
+	"devDependencies": {
+		"jshint": "latest",
+		"protractor": "latest",
+		"browserify": "latest"
+	},
+	"scripts": {
+		"test": "npm run test:protractor -s",
+		"test:protractor": "jasmine test",
+		"build": "npm run build:jshint -s && npm run build:browserify -s",
+		"build:jshint": "jshint src/*.js",
+		"build:browserify": "browserify src/main.js > dist/angular-image-mask.js"
+	},
+	"main": "dist/angular-image-mask",
+	"dependencies": {
+		"angular": "1.4.x"
+	}
+}
