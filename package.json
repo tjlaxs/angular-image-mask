@@ -22,14 +22,14 @@
 		"browserify": "latest"
 	},
 	"scripts": {
-		"test": "npm run test:protractor -s",
+		"test": "npm run test:protractor",
 		"test:protractor": "jasmine test",
-		"build": "npm run build:jshint -s && npm run build:browserify -s && npm run build:templates -s",
+		"build": "npm run build:jshint && npm run build:browserify && npm run build:templates",
 		"build:jshint": "jshint src/main.js",
 		"build:browserify": "browserify src/main.js > dist/angular-image-mask.js",
 		"build:templates": "cp -a templates dist/",
-		"build:examples": "npm run build -s && npm run build:examples-copy -s && npm run build:examples-libs -s",
-		"build:examples-copy": "cp -a examples dist/ && cp dist/angular-image-mask.js dist/examples/ && cp -a templates dist/examples/",
+		"build:examples": "npm run build && npm run build:examples-copy && npm run build:examples-libs",
+		"build:examples-copy": "cp -a examples dist/ && cp dist/angular-image-mask.js dist/examples/ && cp -a templates dist/examples/ && cp -a img dist/examples/",
 		"build:examples-libs": "cp node_modules/angular/angular.js dist/examples/"
 	},
 	"main": "dist/angular-image-mask",

@@ -24,7 +24,8 @@
 </head>
 <body ng-controller="BasicController">
 <h1>Mask</h1>
-<tjl-image-mask src="test.png" paths="paths" />
+<canvas tjl-image-mask width="640" height="480" src="img/test.png" paths="paths"></canvas>
+<div><h2>Html</h2><pre>&lt;canvas tjl-image-mask width="640" height="480" src="img/test.png" paths="paths"&gt;&lt;/canvas&gt;</pre></div>
 <div><h2>Paths</h2><pre>{{paths | json}}</pre></div>
 </body>
 </html>
