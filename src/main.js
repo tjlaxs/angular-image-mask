@@ -1,6 +1,8 @@
 (function() {
 	'use strict';
 
+	var Line = require('./line.js');
+
 	var aim = angular.module('tjlaxs.aim', []);
 
 	var debug = { state: true };
@@ -23,10 +25,11 @@
 				context.stroke();
 
 				context.beginPath();
-				context.arc(data[0],data[1],5,0,Math.PI*2,true);
+				context.arc(data[0], data[1], 5, 0, Math.PI*2, true);
 				context.stroke();
+
 				context.beginPath();
-				context.arc(data[2],data[3],5,0,Math.PI*2,true);
+				context.arc(data[2], data[3], 5, 0, Math.PI*2, true);
 				context.stroke();
 			}
 
