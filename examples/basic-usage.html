@@ -11,21 +11,56 @@
 			{
 				name: 'Line 1',
 				type: 'Line',
-				data: [100, 150, 200, 250]
+				data: [[100, 150],
+					[200, 250]]
 			},
 			{
 				name: 'Line 2',
 				type: 'Line',
-				data: [300, 350, 390, 420]
+				data: [[300, 350],
+					[390, 420]]
 			}
 		];
 	}]);
 </script>
+<style>
+.container { 
+    width:100%; height:100%; 
+    position:relative;
+}
+
+#bgimg { 
+    width:100%; height:100%; 
+    position:absolute; top:0px; left:0px;
+}
+
+#cnvs { 
+    width:100%; height:100%; 
+    position:absolute; top:0px; left:0px;
+    background-color: rgba(255,0,0,.1);
+}
+
+.outsideContainer { 
+    width:640px; height:480px; 
+    margin: 0; 
+    border:1px solid blue;
+}
+</style>
 </head>
+
 <body ng-controller="BasicController">
+
 <h1>Mask</h1>
-<canvas tjl-image-mask width="640" height="480" src="img/test.png" paths="paths"></canvas>
-<div><h2>Html</h2><pre>&lt;canvas tjl-image-mask width="640" height="480" src="img/test.png" paths="paths"&gt;&lt;/canvas&gt;</pre></div>
+<div class="outerContainer">
+<div class="container">
+<img id="bgimg" src="img/test.png" />
+<canvas id="cnvs" tjl-image-mask width="640" height="480" paths="paths"></canvas>
+</div>
+</div>
+
+<div><h2>Html</h2><pre>&lt;canvas tjl-image-mask width="640" height="480" paths="paths"&gt;&lt;/canvas&gt;</pre></div>
+
 <div><h2>Paths</h2><pre>{{paths | json}}</pre></div>
+
 </body>
 </html>

@@ -1,7 +1,7 @@
 (function() {
 	'use strict';
 
-	var Line = require('./line.js');
+	var Mask = require('./mask.js');
 
 	var aim = angular.module('tjlaxs.aim', []);
 
@@ -18,51 +18,17 @@
 
 	aim.directive('tjlImageMask', function() {
 		function link(scope, element, attrs) {
-			function renderLine(context, data) {
-				context.beginPath();
-				context.moveTo(data[0], data[1]);
-				context.lineTo(data[2], data[3]);
-				context.stroke();
-
-				context.beginPath();
-				context.arc(data[0], data[1], 5, 0, Math.PI*2, true);
-				context.stroke();
-
-				context.beginPath();
-				context.arc(data[2], data[3], 5, 0, Math.PI*2, true);
-				context.stroke();
-			}
-
-			function renderCanvas(context, image, paths) {
-				context.drawImage(image, 0, 0);
-				debug.log('Rendering image:' + image.src);
-				angular.forEach(paths, function(path) {
-					var str = 'Rendering path: ';
-					switch(path.type) {
-						case 'Line':
-							renderLine(context, path.data);
-							break;
-						default:
-							debug.log('ERR: Unrenderable type:' + path.type);
-							break;
-					}
-					angular.forEach(path.data, function(data) {
-						str += data + ' ';
-					});
-					debug.log(str);
-				});
-			}
-			
 			debug.log(scope);
 
 			var ctx = element[0].getContext('2d');
 			ctx.strokeStyle = 'rgb(200, 20, 10)';
 			var img = new Image();
 			img.src = attrs.src;
+			var mask = new Mask(scope.paths);
 
 			img.onload = function() {
 				debug.log("Image loaded: " + img.src);
-				renderCanvas(ctx, img, scope.paths);
+				mask.draw(ctx);
 			};
 		}
 
