@@ -3,19 +3,19 @@
 
 	var Path = require('./path.js');
 
-	function Mask(paths) {
+	function Mask(pathList) {
 		var self = this;
 
-		self.json = paths;
-		self.paths = [];
+		var json = pathList;
+		var paths = [];
 
-		angular.forEach(self.json, function(value, key) {
-			self.paths.push(new Path(value));
+		angular.forEach(json, function(value, key) {
+			paths.push(new Path(value));
 		});
 
 		self.draw = function(context) {
 			console.log(self);
-			angular.forEach(self.paths, function(path) {
+			angular.forEach(paths, function(path) {
 				path.draw(context);
 			});
 		};

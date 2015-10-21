@@ -4,13 +4,15 @@
 	function Point(x, y, r) {
 		var self = this;
 
+		var defaultR = 5;
+
 		if(angular.isArray(x)) {
 			self.json = x;
-			self.x = x[0];
-			self.y = x[1];
-			self.r = x[2];
+			self.x = x[0] || 0;
+			self.y = x[1] || 0;
+			self.r = x[2] || defaultR;
 		} else {
-			self.moveTo(x, y, r);
+			self.moveTo(x, y, r || defaultR);
 		}
 
 		self.distance = function(px, py) {

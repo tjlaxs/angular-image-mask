@@ -11,14 +11,14 @@
 			{
 				name: 'Line 1',
 				type: 'Line',
-				data: [[100, 150],
-					[200, 250]]
+				data: [[0, 0],
+					[640, 480]]
 			},
 			{
 				name: 'Line 2',
 				type: 'Line',
-				data: [[300, 350],
-					[390, 420]]
+				data: [[0, 480],
+					[640, 0]]
 			}
 		];
 	}]);
@@ -54,7 +54,7 @@
 <div class="outerContainer">
 <div class="container">
 <img class="bgimg" src="img/test.png" />
-<canvas class="cnvs" tjl-image-mask paths="paths"></canvas>
+<canvas class="cnvs" tjl-image-mask width="640" height="480" paths="paths"></canvas>
 </div>
 </div>
 

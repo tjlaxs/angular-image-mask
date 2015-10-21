@@ -19,8 +19,8 @@
 			console.log(self);
 			for(var i = 0; i < self.points.length - 1; i++) {
 				context.beginPath();
-				context.moveTo(self.points[i][0], self.points[i][1]);
-				context.moveTo(self.points[i+1][0], self.points[i+1][1]);
+				context.moveTo(self.points[i].x, self.points[i].y);
+				context.lineTo(self.points[i+1].x, self.points[i+1].y);
 				context.stroke();
 			}
 			angular.forEach(self.points, function(point) {

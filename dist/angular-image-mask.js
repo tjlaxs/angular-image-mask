@@ -41,19 +41,19 @@
 
 	var Path = require('./path.js');
 
-	function Mask(paths) {
+	function Mask(pathList) {
 		var self = this;
 
-		self.json = paths;
-		self.paths = [];
+		var json = pathList;
+		var paths = [];
 
-		angular.forEach(self.json, function(value, key) {
-			self.paths.push(new Path(value));
+		angular.forEach(json, function(value, key) {
+			paths.push(new Path(value));
 		});
 
 		self.draw = function(context) {
 			console.log(self);
-			angular.forEach(self.paths, function(path) {
+			angular.forEach(paths, function(path) {
 				path.draw(context);
 			});
 		};
@@ -86,8 +86,8 @@
 			console.log(self);
 			for(var i = 0; i < self.points.length - 1; i++) {
 				context.beginPath();
-				context.moveTo(self.points[i][0], self.points[i][1]);
-				context.moveTo(self.points[i+1][0], self.points[i+1][1]);
+				context.moveTo(self.points[i].x, self.points[i].y);
+				context.lineTo(self.points[i+1].x, self.points[i+1].y);
 				context.stroke();
 			}
 			angular.forEach(self.points, function(point) {
@@ -108,13 +108,15 @@
 	function Point(x, y, r) {
 		var self = this;
 
+		var defaultR = 5;
+
 		if(angular.isArray(x)) {
 			self.json = x;
-			self.x = x[0];
-			self.y = x[1];
-			self.r = x[2];
+			self.x = x[0] || 0;
+			self.y = x[1] || 0;
+			self.r = x[2] || defaultR;
 		} else {
-			self.moveTo(x, y, r);
+			self.moveTo(x, y, r || defaultR);
 		}
 
 		self.distance = function(px, py) {
