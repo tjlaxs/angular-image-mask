@@ -6,31 +6,20 @@
 
 	var aim = angular.module('tjlaxs.aim', []);
 
-	var debug = { state: true };
-	debug.log = function(string) {
-		if(debug.state === true) {
-			console.log(string);
-		}
-	};
-
 	aim.controller('imageMaskController', ['$scope', function($scope) {
 	}]);
 
 
 	aim.directive('tjlImageMask', function() {
 		function link(scope, element, attrs) {
-			debug.log(scope);
-
 			var ctx = element[0].getContext('2d');
 			ctx.strokeStyle = 'rgb(200, 20, 10)';
-			var img = new Image();
-			img.src = attrs.src;
 			var mask = new Mask(scope.paths);
 
-			img.onload = function() {
-				debug.log("Image loaded: " + img.src);
+			scope.$watch('paths', function() {
+				console.log(scope.paths);
 				mask.draw(ctx);
-			};
+			});
 		}
 
 		var ret = {
@@ -53,20 +42,24 @@
 	var Path = require('./path.js');
 
 	function Mask(paths) {
-		this.json = paths;
-		this.paths = [];
-		angular.forEach(this.json, function(value, key) {
-			this.paths.push(new Path(value));
-		});
-		return this;
-	}
+		var self = this;
 
-	Mask.prototype.draw = function(context) {
-		angular.forEach(this.paths, function(path) {
-			console.log(this);
-			path.draw(context);
+		self.json = paths;
+		self.paths = [];
+
+		angular.forEach(self.json, function(value, key) {
+			self.paths.push(new Path(value));
 		});
-	};
+
+		self.draw = function(context) {
+			console.log(self);
+			angular.forEach(self.paths, function(path) {
+				path.draw(context);
+			});
+		};
+
+		return self;
+	}
 
 	module.exports = Mask;
 })();
@@ -78,28 +71,32 @@
 	var Point = require('./point.js');
 
 	function Path(path) {
-		this.json = path;
-		this.name = path.name;
-		this.type = path.type;
-		this.points = [];
-		angular.forEach(path.data, function(value, key) {
-			this.points.push(new Point(value));
-		});
-		return this;
-	}
+		var self = this;
 
-	Path.prototype.draw = function(context) {
-		console.log(this);
-		for(var i = 0; i < this.points.length - 1; i++) {
-			context.beginPath();
-			context.moveTo(this.points[i][0], this.points[i][1]);
-			context.moveTo(this.points[i+1][0], this.points[i+1][1]);
-			context.stroke();
-		}
-		angular.forEach(this.points, function(point) {
-			point.draw(context);
+		self.json = path;
+		self.name = path.name;
+		self.type = path.type;
+		self.points = [];
+
+		angular.forEach(path.data, function(value, key) {
+			self.points.push(new Point(value));
 		});
-	};
+
+		self.draw = function(context) {
+			console.log(self);
+			for(var i = 0; i < self.points.length - 1; i++) {
+				context.beginPath();
+				context.moveTo(self.points[i][0], self.points[i][1]);
+				context.moveTo(self.points[i+1][0], self.points[i+1][1]);
+				context.stroke();
+			}
+			angular.forEach(self.points, function(point) {
+				point.draw(context);
+			});
+		};
+
+		return self;
+	}
 
 	module.exports = Path;
 })();
@@ -107,40 +104,44 @@
 },{"./point.js":4}],4:[function(require,module,exports){
 (function() {
 	'use strict';
-	
+
 	function Point(x, y, r) {
+		var self = this;
+
 		if(angular.isArray(x)) {
-			this.json = x;
-			this.x = x[0];
-			this.y = x[1];
-			this.r = x[2];
+			self.json = x;
+			self.x = x[0];
+			self.y = x[1];
+			self.r = x[2];
 		} else {
-			this.moveTo(x, y, r);
+			self.moveTo(x, y, r);
 		}
-		return this;
+
+		self.distance = function(px, py) {
+			console.log(self);
+			var dx = px - self.x;
+			var dy = py - self.y;
+			return Math.sqrt(dx*dx + dy*dy);
+		};
+
+		self.moveTo = function(x, y, r) {
+			console.log(self);
+			self.x = x;
+			self.y = y;
+			self.r = r || self.r;
+			self.json = [x, y, r];
+			return self;
+		};
+
+		self.draw = function(context) {
+			console.log(self);
+			context.beginPath();
+			context.arc(self.x, self.y, self.r, 0, Math.PI*2, true);
+			context.stroke();
+		};
+
+		return self;
 	}
-
-
-	Point.prototype.distance = function(px, py) {
-		var dx = px - this.x;
-		var dy = py - this.y;
-		return Math.sqrt(dx*dx + dy*dy);
-	};
-	
-	Point.prototype.moveTo = function(x, y, r) {
-		this.x = x;
-		this.y = y;
-		this.r = r || this.r;
-		this.json = [x, y, r];
-		return this;
-	};
-	
-	Point.prototype.draw = function(context) {
-		console.log(this);
-		context.beginPath();
-		context.arc(this.x, this.y, this.r, 0, Math.PI*2, true);
-		context.stroke();
-	};
 
 	module.exports = Point;
 })();

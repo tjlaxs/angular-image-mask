@@ -1,39 +1,43 @@
 (function() {
 	'use strict';
-	
+
 	function Point(x, y, r) {
+		var self = this;
+
 		if(angular.isArray(x)) {
-			this.json = x;
-			this.x = x[0];
-			this.y = x[1];
-			this.r = x[2];
+			self.json = x;
+			self.x = x[0];
+			self.y = x[1];
+			self.r = x[2];
 		} else {
-			this.moveTo(x, y, r);
+			self.moveTo(x, y, r);
 		}
-		return this;
+
+		self.distance = function(px, py) {
+			console.log(self);
+			var dx = px - self.x;
+			var dy = py - self.y;
+			return Math.sqrt(dx*dx + dy*dy);
+		};
+
+		self.moveTo = function(x, y, r) {
+			console.log(self);
+			self.x = x;
+			self.y = y;
+			self.r = r || self.r;
+			self.json = [x, y, r];
+			return self;
+		};
+
+		self.draw = function(context) {
+			console.log(self);
+			context.beginPath();
+			context.arc(self.x, self.y, self.r, 0, Math.PI*2, true);
+			context.stroke();
+		};
+
+		return self;
 	}
-
-
-	Point.prototype.distance = function(px, py) {
-		var dx = px - this.x;
-		var dy = py - this.y;
-		return Math.sqrt(dx*dx + dy*dy);
-	};
-	
-	Point.prototype.moveTo = function(x, y, r) {
-		this.x = x;
-		this.y = y;
-		this.r = r || this.r;
-		this.json = [x, y, r];
-		return this;
-	};
-	
-	Point.prototype.draw = function(context) {
-		console.log(this);
-		context.beginPath();
-		context.arc(this.x, this.y, this.r, 0, Math.PI*2, true);
-		context.stroke();
-	};
 
 	module.exports = Point;
 })();
