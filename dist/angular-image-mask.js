@@ -2,14 +2,9 @@
 (function() {
 	'use strict';
 
-	var aim = angular.module('tjlaxs.aim', []);
+	var Mask = require('./mask.js');
 
-	var debug = { state: true };
-	debug.log = function(string) {
-		if(debug.state === true) {
-			console.log(string);
-		}
-	};
+	var aim = angular.module('tjlaxs.aim', []);
 
 	aim.controller('imageMaskController', ['$scope', function($scope) {
 	}]);
@@ -17,51 +12,14 @@
 
 	aim.directive('tjlImageMask', function() {
 		function link(scope, element, attrs) {
-			function renderLine(context, data) {
-				context.beginPath();
-				context.moveTo(data[0], data[1]);
-				context.lineTo(data[2], data[3]);
-				context.stroke();
-
-				context.beginPath();
-				context.arc(data[0],data[1],5,0,Math.PI*2,true);
-				context.stroke();
-				context.beginPath();
-				context.arc(data[2],data[3],5,0,Math.PI*2,true);
-				context.stroke();
-			}
-
-			function renderCanvas(context, image, paths) {
-				context.drawImage(image, 0, 0);
-				debug.log('Rendering image:' + image.src);
-				angular.forEach(paths, function(path) {
-					var str = 'Rendering path: ';
-					switch(path.type) {
-						case 'Line':
-							renderLine(context, path.data);
-							break;
-						default:
-							debug.log('ERR: Unrenderable type:' + path.type);
-							break;
-					}
-					angular.forEach(path.data, function(data) {
-						str += data + ' ';
-					});
-					debug.log(str);
-				});
-			}
-			
-			debug.log(scope);
-
 			var ctx = element[0].getContext('2d');
 			ctx.strokeStyle = 'rgb(200, 20, 10)';
-			var img = new Image();
-			img.src = attrs.src;
+			var mask = new Mask(scope.paths);
 
-			img.onload = function() {
-				debug.log("Image loaded: " + img.src);
-				renderCanvas(ctx, img, scope.paths);
-			};
+			scope.$watch('paths', function() {
+				console.log(scope.paths);
+				mask.draw(ctx);
+			});
 		}
 
 		var ret = {
@@ -75,6 +33,119 @@
 		return ret;
 	});
 
+})();
+
+},{"./mask.js":2}],2:[function(require,module,exports){
+(function() {
+	'use strict';
+
+	var Path = require('./path.js');
+
+	function Mask(pathList) {
+		var self = this;
+
+		var json = pathList;
+		var paths = [];
+
+		angular.forEach(json, function(value, key) {
+			paths.push(new Path(value));
+		});
+
+		self.draw = function(context) {
+			console.log(self);
+			angular.forEach(paths, function(path) {
+				path.draw(context);
+			});
+		};
+
+		return self;
+	}
+
+	module.exports = Mask;
+})();
+
+},{"./path.js":3}],3:[function(require,module,exports){
+(function() {
+	'use strict';
+
+	var Point = require('./point.js');
+
+	function Path(path) {
+		var self = this;
+
+		self.json = path;
+		self.name = path.name;
+		self.type = path.type;
+		self.points = [];
+
+		angular.forEach(path.data, function(value, key) {
+			self.points.push(new Point(value));
+		});
+
+		self.draw = function(context) {
+			console.log(self);
+			for(var i = 0; i < self.points.length - 1; i++) {
+				context.beginPath();
+				context.moveTo(self.points[i].x, self.points[i].y);
+				context.lineTo(self.points[i+1].x, self.points[i+1].y);
+				context.stroke();
+			}
+			angular.forEach(self.points, function(point) {
+				point.draw(context);
+			});
+		};
+
+		return self;
+	}
+
+	module.exports = Path;
+})();
+
+},{"./point.js":4}],4:[function(require,module,exports){
+(function() {
+	'use strict';
+
+	function Point(x, y, r) {
+		var self = this;
+
+		var defaultR = 5;
+
+		if(angular.isArray(x)) {
+			self.json = x;
+			self.x = x[0] || 0;
+			self.y = x[1] || 0;
+			self.r = x[2] || defaultR;
+		} else {
+			self.moveTo(x, y, r || defaultR);
+		}
+
+		self.distance = function(px, py) {
+			console.log(self);
+			var dx = px - self.x;
+			var dy = py - self.y;
+			return Math.sqrt(dx*dx + dy*dy);
+		};
+
+		self.moveTo = function(x, y, r) {
+			console.log(self);
+			self.x = x;
+			self.y = y;
+			self.r = r || self.r;
+			self.json = [x, y, r];
+			return self;
+		};
+
+		self.draw = function(context) {
+			console.log(self);
+			context.beginPath();
+			context.arc(self.x, self.y, self.r, 0, Math.PI*2, true);
+			context.stroke();
+		};
+
+		return self;
+	}
+
+	module.exports = Point;
 })();
 
 },{}]},{},[1]);
