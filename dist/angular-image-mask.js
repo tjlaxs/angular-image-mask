@@ -14,6 +14,9 @@
 		var ctx = null;
 		var canvas = null;
 		var mask = null;
+		var bRect = null;
+		var mouseX = 0;
+		var mouseY = 0;
 
 		function init(element, scope) {
 			canvas = element[0];
@@ -22,6 +25,12 @@
 			mask = new Mask(scope.paths);
 			canvas.addEventListener("mousedown", mouseDownListener, false);
 			canvas.addEventListener("mouseup", mouseUpListener, false);
+			bRect = canvas.getBoundingClientRect();
+		}
+
+		function updateMouse(x, y) {
+			mouseX = (x - bRect.left) * (canvas.width / bRect.width);
+			mouseY = (y - bRect.top) * (canvas.height / bRect.height);
 		}
 
 		function draw() {
@@ -30,18 +39,20 @@
 		}
 
 		function mouseDownListener(evt) {
-			if(mask.startDrag(evt.clientX, evt.clientY)) {
+			updateMouse(evt.x, evt.y);
+			if(mask.startDrag(mouseX, mouseY)) {
 				canvas.addEventListener("mousemove", mouseMoveListener, false);
 			}
 		}
 
 		function mouseMoveListener(evt) {
-			mask.moveDrag(evt.clientX, evt.clientY);
+			updateMouse(evt.x, evt.y);
+			mask.moveDrag(mouseX, mouseY);
 			draw();
 		}
 
 		function mouseUpListener(evt) {
-			console.log("Up X,Y: " + evt.clientX + "," + evt.clientY);
+			updateMouse(evt.x, evt.y);
 			canvas.removeEventListener("mousemove", mouseMoveListener, false);
 		}
 
