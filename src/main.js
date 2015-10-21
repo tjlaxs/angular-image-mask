@@ -10,15 +10,46 @@
 
 
 	aim.directive('tjlImageMask', function() {
-		function link(scope, element, attrs) {
-			var ctx = element[0].getContext('2d');
-			ctx.strokeStyle = 'rgb(200, 20, 10)';
-			var mask = new Mask(scope.paths);
+		var ctx = null;
+		var canvas = null;
+		var mask = null;
 
+		function init(element, scope) {
+			canvas = element[0];
+			ctx = canvas.getContext('2d');
+			ctx.strokeStyle = 'rgb(200, 20, 10)';
+			mask = new Mask(scope.paths);
+			canvas.addEventListener("mousedown", mouseDownListener, false);
+			canvas.addEventListener("mouseup", mouseUpListener, false);
+		}
+
+		function draw() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			mask.draw(ctx);
+		}
+
+		function mouseDownListener(evt) {
+			if(mask.startDrag(evt.clientX, evt.clientY)) {
+				canvas.addEventListener("mousemove", mouseMoveListener, false);
+			}
+		}
+
+		function mouseMoveListener(evt) {
+			mask.moveDrag(evt.clientX, evt.clientY);
+			draw();
+		}
+
+		function mouseUpListener(evt) {
+			console.log("Up X,Y: " + evt.clientX + "," + evt.clientY);
+			canvas.removeEventListener("mousemove", mouseMoveListener, false);
+		}
+
+		function link(scope, element, attrs) {
+			init(element, scope);
 			scope.$watch('paths', function() {
 				console.log(scope.paths);
-				mask.draw(ctx);
 			});
+			draw();
 		}
 
 		var ret = {

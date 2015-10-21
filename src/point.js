@@ -22,6 +22,11 @@
 			return Math.sqrt(dx*dx + dy*dy);
 		};
 
+		self.hit = function(mx, my) {
+			return self.distance(mx, my) < self.r;
+
+		};
+
 		self.moveTo = function(x, y, r) {
 			console.log(self);
 			self.x = x;

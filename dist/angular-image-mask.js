@@ -11,15 +11,46 @@
 
 
 	aim.directive('tjlImageMask', function() {
-		function link(scope, element, attrs) {
-			var ctx = element[0].getContext('2d');
-			ctx.strokeStyle = 'rgb(200, 20, 10)';
-			var mask = new Mask(scope.paths);
+		var ctx = null;
+		var canvas = null;
+		var mask = null;
 
+		function init(element, scope) {
+			canvas = element[0];
+			ctx = canvas.getContext('2d');
+			ctx.strokeStyle = 'rgb(200, 20, 10)';
+			mask = new Mask(scope.paths);
+			canvas.addEventListener("mousedown", mouseDownListener, false);
+			canvas.addEventListener("mouseup", mouseUpListener, false);
+		}
+
+		function draw() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			mask.draw(ctx);
+		}
+
+		function mouseDownListener(evt) {
+			if(mask.startDrag(evt.clientX, evt.clientY)) {
+				canvas.addEventListener("mousemove", mouseMoveListener, false);
+			}
+		}
+
+		function mouseMoveListener(evt) {
+			mask.moveDrag(evt.clientX, evt.clientY);
+			draw();
+		}
+
+		function mouseUpListener(evt) {
+			console.log("Up X,Y: " + evt.clientX + "," + evt.clientY);
+			canvas.removeEventListener("mousemove", mouseMoveListener, false);
+		}
+
+		function link(scope, element, attrs) {
+			init(element, scope);
 			scope.$watch('paths', function() {
 				console.log(scope.paths);
-				mask.draw(ctx);
 			});
+			draw();
 		}
 
 		var ret = {
@@ -46,6 +77,8 @@
 
 		var json = pathList;
 		var paths = [];
+		self.dragging = false;
+		var selectedObject = null;
 
 		angular.forEach(json, function(value, key) {
 			paths.push(new Path(value));
@@ -56,6 +89,25 @@
 			angular.forEach(paths, function(path) {
 				path.draw(context);
 			});
+		};
+
+		self.startDrag = function(mx, my) {
+			for(var i = 0; i < paths.length; i++) {
+				for(var j = 0; j < paths[i].points.length; j++) {
+					if(paths[i].points[j].hit(mx, my)) {
+						console.log("point was clicked");
+						self.dragging = true;
+						selectedObject = paths[i].points[j];
+						return true;
+					}
+				}
+			}
+			return false;
+		};
+
+		self.moveDrag = function(mx, my) {
+			selectedObject.x = mx;
+			selectedObject.y = my;
 		};
 
 		return self;
@@ -124,6 +176,11 @@
 			var dx = px - self.x;
 			var dy = py - self.y;
 			return Math.sqrt(dx*dx + dy*dy);
+		};
+
+		self.hit = function(mx, my) {
+			return self.distance(mx, my) < self.r;
+
 		};
 
 		self.moveTo = function(x, y, r) {
