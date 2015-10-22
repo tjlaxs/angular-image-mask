@@ -46,13 +46,16 @@
 		}
 
 		function mouseMoveListener(evt) {
-			updateMouse(evt.x, evt.y);
-			mask.moveDrag(mouseX, mouseY);
-			draw();
+			if(mask.dragging) {
+				updateMouse(evt.x, evt.y);
+				mask.moveDrag(mouseX, mouseY);
+				draw();
+			}
 		}
 
 		function mouseUpListener(evt) {
 			updateMouse(evt.x, evt.y);
+			mask.stopDrag();
 			canvas.removeEventListener("mousemove", mouseMoveListener, false);
 		}
 
@@ -114,6 +117,11 @@
 				}
 			}
 			return false;
+		};
+
+		self.stopDrag = function(mx, my) {
+			self.dragging = false;
+			selectedObject = null;
 		};
 
 		self.moveDrag = function(mx, my) {

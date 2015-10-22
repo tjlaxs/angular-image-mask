@@ -36,6 +36,11 @@
 			return false;
 		};
 
+		self.stopDrag = function(mx, my) {
+			self.dragging = false;
+			selectedObject = null;
+		};
+
 		self.moveDrag = function(mx, my) {
 			selectedObject.x = mx;
 			selectedObject.y = my;
