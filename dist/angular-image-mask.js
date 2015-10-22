@@ -43,6 +43,15 @@
 			if(mask.startDrag(mouseX, mouseY)) {
 				canvas.addEventListener("mousemove", mouseMoveListener, false);
 			}
+
+			// Prevent event going further
+			if (evt.preventDefault) {
+				evt.preventDefault();
+			}
+			else if (evt.returnValue) {
+				evt.returnValue = false;
+			}
+
 		}
 
 		function mouseMoveListener(evt) {
