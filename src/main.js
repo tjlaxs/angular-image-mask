@@ -1,3 +1,4 @@
+/* globals require, angular */
 (function() {
 	'use strict';
 
@@ -5,9 +6,8 @@
 
 	var aim = angular.module('tjlaxs.aim', []);
 
-	aim.controller('imageMaskController', ['$scope', function($scope) {
-	}]);
-
+	aim.controller('imageMaskController', function() {
+	});
 
 	aim.directive('tjlImageMask', function() {
 		var ctx = null;
@@ -16,14 +16,16 @@
 		var bRect = null;
 		var mouseX = 0;
 		var mouseY = 0;
+		var rootScope = null;
 
 		function init(element, scope) {
+			rootScope = scope;
 			canvas = element[0];
 			ctx = canvas.getContext('2d');
 			ctx.strokeStyle = 'rgb(200, 20, 10)';
 			mask = new Mask(scope.paths);
-			canvas.addEventListener("mousedown", mouseDownListener, false);
-			canvas.addEventListener("mouseup", mouseUpListener, false);
+			canvas.addEventListener('mousedown', mouseDownListener, false);
+			canvas.addEventListener('mouseup', mouseUpListener, false);
 			bRect = canvas.getBoundingClientRect();
 		}
 
@@ -40,7 +42,7 @@
 		function mouseDownListener(evt) {
 			updateMouse(evt.x, evt.y);
 			if(mask.startDrag(mouseX, mouseY)) {
-				canvas.addEventListener("mousemove", mouseMoveListener, false);
+				canvas.addEventListener('mousemove', mouseMoveListener, false);
 			}
 
 			// Prevent event going further
@@ -50,7 +52,6 @@
 			else if (evt.returnValue) {
 				evt.returnValue = false;
 			}
-
 		}
 
 		function mouseMoveListener(evt) {
@@ -64,10 +65,13 @@
 		function mouseUpListener(evt) {
 			updateMouse(evt.x, evt.y);
 			mask.stopDrag();
-			canvas.removeEventListener("mousemove", mouseMoveListener, false);
+			canvas.removeEventListener('mousemove', mouseMoveListener, false);
+			console.log('UP');
+			console.log(rootScope.paths);
+			rootScope.$digest();
 		}
 
-		function link(scope, element, attrs) {
+		function link(scope, element/*, attrs*/) {
 			init(element, scope);
 			scope.$watch('paths', function() {
 				console.log(scope.paths);

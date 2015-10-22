@@ -1,3 +1,4 @@
+/* globals require, angular, module */
 (function() {
 	'use strict';
 
@@ -6,18 +7,32 @@
 	function Path(path) {
 		var self = this;
 
-		self.json = path;
-		self.name = path.name;
-		self.type = path.type;
+		var json = null;
+		var name = path.name;
+		var type = path.type;
 		self.points = [];
 
-		angular.forEach(path.data, function(value, key) {
+		/*
+		 * Initialization
+		 */
+
+		json = path;
+
+		angular.forEach(path.data, function(value) {
 			self.points.push(new Point(value));
 		});
+
+		/*
+		 * Methods
+		 */
+
+		self.name = function() { return name; };
+		self.type = function() { return type; };
 
 		self.draw = function(context) {
 			console.log(self);
 			for(var i = 0; i < self.points.length - 1; i++) {
+				console.log(self.points[i].x, self.points[i].y);
 				context.beginPath();
 				context.moveTo(self.points[i].x, self.points[i].y);
 				context.lineTo(self.points[i+1].x, self.points[i+1].y);
