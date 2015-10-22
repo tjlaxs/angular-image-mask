@@ -18,12 +18,12 @@
 	"license": "MIT",
 	"devDependencies": {
 		"jshint": "latest",
-		"protractor": "latest",
+		"jasmine-node": "latest",
 		"browserify": "latest"
 	},
 	"scripts": {
-		"test": "npm run test:protractor",
-		"test:protractor": "jasmine test",
+		"test": "npm run test:jasmine",
+		"test:jasmine": "jasmine-node spec",
 		"build": "npm run build:jshint && npm run build:browserify && npm run build:templates",
 		"build:jshint": "jshint src/main.js src/path.js src/point.js src/mask.js",
 		"build:browserify": "browserify src/main.js > dist/angular-image-mask.js",
