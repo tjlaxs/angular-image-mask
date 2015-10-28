@@ -1,3 +1,4 @@
+/* globals require, angular, module */
 (function() {
 	'use strict';
 
@@ -11,9 +12,17 @@
 		self.dragging = false;
 		var selectedObject = null;
 
-		angular.forEach(json, function(value, key) {
+		/*
+		 * Initialization
+		 */
+
+		angular.forEach(json, function(value) {
 			paths.push(new Path(value));
 		});
+
+		/*
+		 * Methods
+		 */
 
 		self.draw = function(context) {
 			console.log(self);
@@ -26,7 +35,7 @@
 			for(var i = 0; i < paths.length; i++) {
 				for(var j = 0; j < paths[i].points.length; j++) {
 					if(paths[i].points[j].hit(mx, my)) {
-						console.log("point was clicked");
+						console.log('point was clicked');
 						self.dragging = true;
 						selectedObject = paths[i].points[j];
 						return true;
@@ -36,9 +45,13 @@
 			return false;
 		};
 
+		self.stopDrag = function() {
+			self.dragging = false;
+			selectedObject = null;
+		};
+
 		self.moveDrag = function(mx, my) {
-			selectedObject.x = mx;
-			selectedObject.y = my;
+			selectedObject.moveTo(mx, my);
 		};
 
 		return self;
