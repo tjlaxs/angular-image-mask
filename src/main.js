@@ -1,8 +1,9 @@
-/* globals require, angular */
+/* jshint node:true */
+/* globals angular */
 (function() {
 	'use strict';
 
-	var Mask = require('./mask.js');
+	var Mask = require('./mask');
 
 	var aim = angular.module('tjlaxs.aim', []);
 
