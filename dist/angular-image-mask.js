@@ -201,6 +201,8 @@
 		var x = 0;
 		var y = 0;
 		var r = 0;
+		var strokeColor = '#000000';
+		var fillColor = 'rgba(255, 255, 255, 0.3)';
 		var json = null;
 
 		Object.defineProperties(self, {
@@ -238,6 +240,14 @@
 		* Methods
 		*/
 
+		self.setColor = function(color, fillColor) {
+			strokeColor = color;
+			self.setFillColor(fillColor);
+		};
+		self.setFillColor = function(color) {
+			fillColor = color;
+		};
+
 		self.distance = function(px, py) {
 			var dx = px - x;
 			var dy = py - y;
@@ -258,9 +268,16 @@
 		};
 
 		self.draw = function(context) {
+			var savedColor = context.strokeStyle;
+			var savedFillColor = context.fillStyle;
+			context.strokeStyle = strokeColor;
+			context.fillStyle = fillColor;
 			context.beginPath();
 			context.arc(x, y, r, 0, Math.PI*2, true);
 			context.stroke();
+			context.fill();
+			context.strokeStyle = savedColor;
+			context.fillStyle = savedFillColor;
 		};
 
 		return self;
@@ -283,6 +300,8 @@
 		*/
 
 		var self = this;
+		var strokeColor = '#ffffff';
+		var fillColor = 'rgba(0, 0, 0, 0.3)';
 		Shape.call(self, conf);
 
 		/*
@@ -290,6 +309,11 @@
 		*/
 
 		self.draw = function(context) {
+			var savedColor = context.strokeStyle;
+			var savedFillColor = context.fillStyle;
+			context.strokeStyle = strokeColor;
+			context.fillStyle = fillColor;
+
 			var points = self.getPoints();
 			context.beginPath();
 			context.moveTo(points[0].x, points[0].y);
@@ -298,11 +322,13 @@
 			}
 			context.closePath();
 			context.stroke();
-			context.fillStyle = 'hsla(120,100%,75%, 0.3)';
 			context.fill();
 			angular.forEach(points, function drawPoint(point) {
 				point.draw(context);
 			});
+
+			context.strokeStyle = savedColor;
+			context.fillStyle = savedFillColor;
 		};
 
 		return self;
