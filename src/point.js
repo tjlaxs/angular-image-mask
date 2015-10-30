@@ -55,7 +55,6 @@
 
 		self.hit = function(mx, my) {
 			return self.distance(mx, my) < r;
-
 		};
 
 		self.moveTo = function(mx, my, mr) {

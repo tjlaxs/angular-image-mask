@@ -26,7 +26,7 @@
 			}
 			context.closePath();
 			context.stroke();
-			context.fillStyle = 'hsla(120,100%,75%, 0.3';
+			context.fillStyle = 'hsla(120,100%,75%, 0.3)';
 			context.fill();
 			angular.forEach(points, function drawPoint(point) {
 				point.draw(context);

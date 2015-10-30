@@ -18,10 +18,10 @@
 		var bRect = null;
 		var mouseX = 0;
 		var mouseY = 0;
-		var rootScope = null;
+		var dirScope = null;
 
 		function init(element, scope) {
-			rootScope = scope;
+			dirScope = scope;
 			canvas = element[0];
 			ctx = canvas.getContext('2d');
 			ctx.strokeStyle = 'rgb(200, 20, 10)';
@@ -68,16 +68,11 @@
 			updateMouse(evt.x, evt.y);
 			mask.stopDrag();
 			canvas.removeEventListener('mousemove', mouseMoveListener, false);
-			console.log('UP');
-			console.log(rootScope.paths);
-			rootScope.$digest();
+			dirScope.$apply();
 		}
 
 		function link(scope, element/*, attrs*/) {
 			init(element, scope);
-			scope.$watch('paths', function() {
-				console.log(scope.paths);
-			});
 			draw();
 		}
 
@@ -248,7 +243,6 @@
 
 		self.hit = function(mx, my) {
 			return self.distance(mx, my) < r;
-
 		};
 
 		self.moveTo = function(mx, my, mr) {
@@ -304,7 +298,7 @@
 			}
 			context.closePath();
 			context.stroke();
-			context.fillStyle = 'hsla(120,100%,75%, 0.3';
+			context.fillStyle = 'hsla(120,100%,75%, 0.3)';
 			context.fill();
 			angular.forEach(points, function drawPoint(point) {
 				point.draw(context);
