@@ -148,7 +148,6 @@
 		};
 
 		self.draw = function(context) {
-			console.log(self);
 			angular.forEach(shapes, function(shape) {
 				shape.draw(context);
 			});
@@ -159,7 +158,6 @@
 				var points = shapes[i].getPoints();
 				for(var j = 0; j < points.length; j++) {
 					if(points[j].hit(mx, my)) {
-						console.log('point was clicked');
 						self.dragging = true;
 						selectedObject = points[j];
 						return true;
@@ -235,7 +233,6 @@
 		 */
 
 		self.distance = function(px, py) {
-			console.log(self);
 			var dx = px - x;
 			var dy = py - y;
 			return Math.sqrt(dx*dx + dy*dy);
@@ -246,8 +243,6 @@
 		};
 
 		self.moveTo = function(mx, my, mr) {
-			console.log('MOVE');
-			console.log(self);
 			x = json[0] = mx;
 			y = json[1] = my;
 			if(json.length > 2) {
@@ -257,7 +252,6 @@
 		};
 
 		self.draw = function(context) {
-			console.log(self);
 			context.beginPath();
 			context.arc(x, y, r, 0, Math.PI*2, true);
 			context.stroke();

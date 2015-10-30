@@ -56,7 +56,6 @@
 		};
 
 		self.draw = function(context) {
-			console.log(self);
 			angular.forEach(shapes, function(shape) {
 				shape.draw(context);
 			});
@@ -67,7 +66,6 @@
 				var points = shapes[i].getPoints();
 				for(var j = 0; j < points.length; j++) {
 					if(points[j].hit(mx, my)) {
-						console.log('point was clicked');
 						self.dragging = true;
 						selectedObject = points[j];
 						return true;

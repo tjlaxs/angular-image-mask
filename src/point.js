@@ -47,7 +47,6 @@
 		 */
 
 		self.distance = function(px, py) {
-			console.log(self);
 			var dx = px - x;
 			var dy = py - y;
 			return Math.sqrt(dx*dx + dy*dy);
@@ -58,8 +57,6 @@
 		};
 
 		self.moveTo = function(mx, my, mr) {
-			console.log('MOVE');
-			console.log(self);
 			x = json[0] = mx;
 			y = json[1] = my;
 			if(json.length > 2) {
@@ -69,7 +66,6 @@
 		};
 
 		self.draw = function(context) {
-			console.log(self);
 			context.beginPath();
 			context.arc(x, y, r, 0, Math.PI*2, true);
 			context.stroke();
