@@ -64,14 +64,16 @@
 
 		self.startDrag = function(mx, my) {
 			for(var i = 0; i < shapes.length; i++) {
-				for(var j = 0; j < shapes[i].points.length; j++) {
-					if(shapes[i].points[j].hit(mx, my)) {
+				var points = shapes[i].getPoints();
+				for(var j = 0; j < points.length; j++) {
+					if(points[j].hit(mx, my)) {
 						console.log('point was clicked');
 						self.dragging = true;
-						selectedObject = shapes[i].points[j];
+						selectedObject = points[j];
 						return true;
 					}
 				}
+				points = null;
 			}
 			return false;
 		};
