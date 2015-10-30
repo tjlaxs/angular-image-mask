@@ -54,6 +54,12 @@
     margin: 0; 
     border:1px solid blue;
 }
+
+.mask-controller {
+	display: flex;
+	flex-direction: row;
+}
+
 </style>
 </head>
 
@@ -62,8 +68,23 @@
 <h1>Mask</h1>
 <div class="outerContainer">
 <div class="container">
-<img class="bgimg" src="img/test.png" />
+<img class="bgimg" alt="Camera feed" src="img/test.png" />
 <canvas class="cnvs" tjl-image-mask width="640" height="480" paths="paths"></canvas>
+</div>
+</div>
+<div class="mask-controller">
+<div class="shapes-controller">
+	<button>New polygon</button><br>
+	<button>Remove polygon</button><br>
+	<select name="shapeSelect" ng-model="paths.selectedShape" ng-options="shape.name for shape in paths track by shape.name">
+	</select>
+</div>
+<div class="shape-editor">
+	<p>Selected shape: {{paths.selectedShape}}</p>
+	<p>
+	<label for="shape-name">Name</label>
+	<input type="text" ng-model="paths.selectedShape.name"></input>
+	</p>
 </div>
 </div>
 
