@@ -14,24 +14,24 @@
 		Object.defineProperties(self, {
 			'x': {
 				get: function() {
-					     return x;
-				     }
+					return x;
+				}
 			},
 			'y': {
 				get: function() {
-					     return y;
-				     }
+					return y;
+				}
 			},
 			'r': {
 				get: function() {
-					     return r;
-				     }
+					return r;
+				}
 			}
 		});
 
 		/*
-		 * Initialization
-		 */
+		* Initialization
+		*/
 
 		if(angular.isArray(dx)) {
 			json = dx;
@@ -43,8 +43,8 @@
 		}
 
 		/*
-		 * Methods
-		 */
+		* Methods
+		*/
 
 		self.distance = function(px, py) {
 			var dx = px - x;

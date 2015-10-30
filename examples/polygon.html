@@ -9,6 +9,21 @@
 	app.controller('BasicController', ['$scope', function($scope) {
 		$scope.paths = [
 			{
+				name: '1 point',
+				type: 'Polygon',
+				data: [ [120, 120]]
+			},
+			{
+				name: '2 point',
+				type: 'Polygon',
+				data: [ [20, 20], [40, 20]]
+			},
+			{
+				name: '3 point',
+				type: 'Polygon',
+				data: [ [120, 20], [140, 20], [140, 120]]
+			},
+			{
 				name: 'Polygon 1',
 				type: 'Polygon',
 				data: [ [100, 100],
