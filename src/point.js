@@ -1,4 +1,5 @@
-/* globals angular, module */
+/* jshint node:true */
+/* globals angular */
 (function() {
 	'use strict';
 

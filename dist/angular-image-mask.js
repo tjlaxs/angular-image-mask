@@ -1,9 +1,10 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-/* globals require, angular */
+/* jshint node:true */
+/* globals angular */
 (function() {
 	'use strict';
 
-	var Mask = require('./mask.js');
+	var Mask = require('./mask');
 
 	var aim = angular.module('tjlaxs.aim', []);
 
@@ -93,50 +94,83 @@
 
 })();
 
-},{"./mask.js":2}],2:[function(require,module,exports){
-/* globals require, angular, module */
+},{"./mask":2}],2:[function(require,module,exports){
+/* jshint node:true */
+/* globals angular */
 (function() {
 	'use strict';
 
-	var Path = require('./path.js');
+	var Polygon = require('./polygon');
+	/*
+	var Line = require('./line');
+	var Rectangle = require('./rectangle');
+	*/
 
-	function Mask(pathList) {
+	function Mask(shapeList) {
 		var self = this;
 
-		var json = pathList;
-		var paths = [];
-		self.dragging = false;
+		var json = shapeList;
+		var shapes = [];
+		var dragging = false;
 		var selectedObject = null;
 
 		/*
-		 * Initialization
-		 */
+		* Initialization
+		*/
 
-		angular.forEach(json, function(value) {
-			paths.push(new Path(value));
+		angular.forEach(shapeList, function(shape) {
+			switch(shape.type) {
+				case 'Polygon':
+					shapes.push(new Polygon(shape));
+					break;
+				/*
+				case 'Line':
+					shapes.push(new Line(shape));
+					break;
+				case 'Rectangle':
+					shapes.push(new Rectangle(shape));
+					break;
+				*/
+				default:
+					console.warn('Unknown shape: ' + shape.type);
+					break;
+			}
 		});
 
 		/*
-		 * Methods
-		 */
+		* Methods
+		*/
+
+		self.getJson = function getJson() {
+			return json;
+		};
+
+		self.getDragging = function() {
+			return dragging;
+		};
+		self.setDragging = function(val) {
+			dragging = val ? true : false;
+		};
 
 		self.draw = function(context) {
 			console.log(self);
-			angular.forEach(paths, function(path) {
-				path.draw(context);
+			angular.forEach(shapes, function(shape) {
+				shape.draw(context);
 			});
 		};
 
 		self.startDrag = function(mx, my) {
-			for(var i = 0; i < paths.length; i++) {
-				for(var j = 0; j < paths[i].points.length; j++) {
-					if(paths[i].points[j].hit(mx, my)) {
+			for(var i = 0; i < shapes.length; i++) {
+				var points = shapes[i].getPoints();
+				for(var j = 0; j < points.length; j++) {
+					if(points[j].hit(mx, my)) {
 						console.log('point was clicked');
 						self.dragging = true;
-						selectedObject = paths[i].points[j];
+						selectedObject = points[j];
 						return true;
 					}
 				}
+				points = null;
 			}
 			return false;
 		};
@@ -156,60 +190,9 @@
 	module.exports = Mask;
 })();
 
-},{"./path.js":3}],3:[function(require,module,exports){
-/* globals require, angular, module */
-(function() {
-	'use strict';
-
-	var Point = require('./point.js');
-
-	function Path(path) {
-		var self = this;
-
-		var json = null;
-		var name = path.name;
-		var type = path.type;
-		self.points = [];
-
-		/*
-		 * Initialization
-		 */
-
-		json = path;
-
-		angular.forEach(path.data, function(value) {
-			self.points.push(new Point(value));
-		});
-
-		/*
-		 * Methods
-		 */
-
-		self.name = function() { return name; };
-		self.type = function() { return type; };
-
-		self.draw = function(context) {
-			console.log(self);
-			for(var i = 0; i < self.points.length - 1; i++) {
-				console.log(self.points[i].x, self.points[i].y);
-				context.beginPath();
-				context.moveTo(self.points[i].x, self.points[i].y);
-				context.lineTo(self.points[i+1].x, self.points[i+1].y);
-				context.stroke();
-			}
-			angular.forEach(self.points, function(point) {
-				point.draw(context);
-			});
-		};
-
-		return self;
-	}
-
-	module.exports = Path;
-})();
-
-},{"./point.js":4}],4:[function(require,module,exports){
-/* globals angular, module */
+},{"./polygon":4}],3:[function(require,module,exports){
+/* jshint node:true */
+/* globals angular */
 (function() {
 	'use strict';
 
@@ -292,4 +275,105 @@
 	module.exports = Point;
 })();
 
-},{}]},{},[1]);
+},{}],4:[function(require,module,exports){
+/* jshint node:true */
+/* globals angular */
+(function() {
+	'use strict';
+
+	var Shape = require('./shape');
+
+	function Polygon(conf) {
+		/*
+		* Initialization
+		*/
+
+		var self = this;
+		Shape.call(self, conf);
+
+		/*
+		* Public methods
+		*/
+
+		self.draw = function(context) {
+			var points = self.getPoints();
+			context.beginPath();
+			context.moveTo(points[0].x, points[0].y);
+			for(var i = 1; i < points.length; i++) {
+				context.lineTo(points[i].x, points[i].y);
+			}
+			context.closePath();
+			context.stroke();
+			context.fillStyle = 'hsla(120,100%,75%, 0.3';
+			context.fill();
+			angular.forEach(points, function drawPoint(point) {
+				point.draw(context);
+			});
+		};
+
+		return self;
+	}
+
+	module.exports = Polygon;
+})();
+
+},{"./shape":5}],5:[function(require,module,exports){
+/* jshint node:true */
+/* globals angular */
+(function() {
+	'use strict';
+
+	var Point = require('./point');
+
+	function Shape(conf) {
+		var self = this;
+
+		/*
+		* Initialization
+		*/
+		
+		var json = conf;
+		var name = conf.name;
+		var type = conf.type;
+		var points = [];
+
+		angular.forEach(conf.data, function(value) {
+			points.push(new Point(value));
+		});
+	
+		/*
+		* Public methods
+		*/
+	
+		self.setName = function(newName) {
+			name = newName;
+		};
+		self.getName = function() {
+			return name;
+		};
+	
+		self.getType = function() {
+			return type;
+		};
+	
+		self.getJson = function() {
+			return json;
+		};
+
+		self.getPoints = function() {
+			return points;
+		};
+
+		self.draw = function drawPoints(context) {
+			angular.forEach(points, function drawPoints(point) {
+				point.draw(context);
+			});
+		};
+	
+		return self;
+	}
+
+	module.exports = Shape;
+})();
+
+},{"./point":3}]},{},[1]);
