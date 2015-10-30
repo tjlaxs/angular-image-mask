@@ -25,6 +25,12 @@
 			ctx = canvas.getContext('2d');
 			ctx.strokeStyle = 'rgb(200, 20, 10)';
 			mask = new Mask(scope.paths);
+			scope.$watch('paths', function(newValue) {
+				if(!angular.isUndefined(newValue)) {
+					mask = new Mask(scope.paths);
+					draw();
+				}
+			});
 			canvas.addEventListener('mousedown', mouseDownListener, false);
 			canvas.addEventListener('mouseup', mouseUpListener, false);
 			bRect = canvas.getBoundingClientRect();
