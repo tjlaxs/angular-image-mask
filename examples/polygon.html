@@ -7,7 +7,18 @@
 <script>
 	var app = angular.module('MyApp', ['tjlaxs.aim']);
 	app.controller('BasicController', ['$scope', function($scope) {
-		$scope.paths = [
+		$scope.config = {};
+		$scope.config.control = {
+			mode: "move",
+			visualConfig: {
+				lineWidth: 1,
+				lineColor: "#ffffff",
+				fillColor: "hsla(0, 100%, 100%, 0.3)",
+				pointBorderColor: "#ffffff",
+				pointFillColor: "hsla(0, 100%, 100%, 0.3)"
+			}
+		};
+		$scope.config.paths = [
 			{
 				name: '1 point',
 				type: 'Polygon',
@@ -57,31 +68,54 @@
 	}]);
 </script>
 <style>
-.container { 
-    width:100%; height:100%; 
-    position:relative;
+.container {
+	width:100%; height:100%;
+	position:relative;
 }
 
-.bgimg { 
-    width:100%; height:100%; 
-    position:absolute; top:0px; left:0px;
+.bgimg {
+	width:100%; height:100%;
+	position:absolute; top:0px; left:0px;
 }
 
-.cnvs { 
-    width:100%; height:100%; 
-    position:absolute; top:0px; left:0px;
-    background-color: rgba(255,0,0,.1);
+.cnvs {
+	width:100%; height:100%;
+	position:absolute; top:0px; left:0px;
+	background-color: rgba(255,0,0,.1);
 }
 
-.outerContainer { 
-    width:640px; height:480px; 
-    margin: 0; 
-    border:1px solid blue;
+.outerContainer {
+	width:640px; height:480px;
+	margin: 0;
+	border:1px solid blue;
 }
 
 .mask-controller {
 	display: flex;
 	flex-direction: row;
+}
+
+.app-container {
+	display: flex;
+	flex-direction: row;
+}
+
+.flex {
+	display: flex;
+	flex-direction: row;
+}
+
+div.shape {
+	padding: 3px;
+}
+
+div.point {
+	padding-left: 5px;
+}
+
+input.coord {
+	padding-left: 5px;
+	width: 3em;
 }
 
 </style>
@@ -90,13 +124,14 @@
 <body ng-controller="BasicController">
 
 <h1>Mask</h1>
+<div class="app-container">
 <div class="outerContainer">
 <div class="container">
 <img class="bgimg" alt="Camera feed" src="img/test.png" />
-<canvas class="cnvs" tjl-image-mask width="640" height="480" paths="paths"></canvas>
+<canvas class="cnvs" tjl-image-mask width="640" height="480" control="config.control" paths="config.paths"></canvas>
 </div>
 </div>
-<div class="mask-controller">
+<!--div class="mask-controller">
 <div class="shapes-controller">
 	<button>New polygon</button><br>
 	<button>Remove polygon</button><br>
@@ -107,14 +142,37 @@
 	<p>Selected shape: {{paths.selectedShape}}</p>
 	<p>
 	<label for="shape-name">Name</label>
-	<input type="text" ng-model="paths.selectedShape.name"></input>
+	<input type="text" ng-model="paths.selectedShape.name">
 	</p>
 </div>
+</div-->
+<div class="edit-mode">
+	<fieldset>
+		<legend>Editor</legend>
+		<label ng-repeat="mode in ['show', 'move', 'add', 'remove']">
+			<input type="radio" ng-model="config.control.mode" value="{{mode}}">{{mode}}
+		</label>
+	</fieldset>
+	<fieldset>
+		<legend>Shapes</legend>
+		<div class="shape" ng-repeat="shape in config.paths track by $index">
+			<input type="text" value="{{shape.name}}">
+			<div class="point" ng-repeat="point in shape.data track by $index">
+				<div class="flex">
+					<div ng-repeat="coord in point track by $index">
+						<input class="coord" type="number" value="{{coord}}">
+					</div>
+				</div>
+			</div>
+		</div>
+	</fieldset>
+</div>
 </div>
 
-<div><h2>Html</h2><pre>&lt;canvas tjl-image-mask width="640" height="480" paths="paths"&gt;&lt;/canvas&gt;</pre></div>
+<div><h2>Html</h2><pre>&lt;canvas tjl-image-mask width="640" height="480" control="config.control" paths="config.paths"&gt;&lt;/canvas&gt;</pre></div>
 
-<div><h2>Paths</h2><pre>{{paths | json}}</pre></div>
+<div><h2>Paths</h2><pre>{{config.paths | json}}</pre></div>
+<div><h2>Control</h2><pre>{{config.control | json}}</pre></div>
 
 </body>
 </html>

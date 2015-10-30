@@ -57,8 +57,8 @@
 		};
 
 		self.moveTo = function(mx, my, mr) {
-			x = json[0] = mx;
-			y = json[1] = my;
+			x = json[0] = Math.round(mx);
+			y = json[1] = Math.round(my);
 			if(json.length > 2) {
 				r = json[2] = mr || r;
 			}
