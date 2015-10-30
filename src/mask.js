@@ -1,44 +1,90 @@
+/* jshint node:true */
+/* globals angular */
 (function() {
 	'use strict';
 
-	var Path = require('./path.js');
+	var Polygon = require('./polygon');
+	/*
+	var Line = require('./line');
+	var Rectangle = require('./rectangle');
+	*/
 
-	function Mask(pathList) {
+	function Mask(shapeList) {
 		var self = this;
 
-		var json = pathList;
-		var paths = [];
-		self.dragging = false;
+		var json = shapeList;
+		var shapes = [];
+		var dragging = false;
 		var selectedObject = null;
 
-		angular.forEach(json, function(value, key) {
-			paths.push(new Path(value));
+		/*
+		* Initialization
+		*/
+
+		angular.forEach(shapeList, function(shape) {
+			switch(shape.type) {
+				case 'Polygon':
+					shapes.push(new Polygon(shape));
+					break;
+				/*
+				case 'Line':
+					shapes.push(new Line(shape));
+					break;
+				case 'Rectangle':
+					shapes.push(new Rectangle(shape));
+					break;
+				*/
+				default:
+					console.warn('Unknown shape: ' + shape.type);
+					break;
+			}
 		});
+
+		/*
+		* Methods
+		*/
+
+		self.getJson = function getJson() {
+			return json;
+		};
+
+		self.getDragging = function() {
+			return dragging;
+		};
+		self.setDragging = function(val) {
+			dragging = val ? true : false;
+		};
 
 		self.draw = function(context) {
 			console.log(self);
-			angular.forEach(paths, function(path) {
-				path.draw(context);
+			angular.forEach(shapes, function(shape) {
+				shape.draw(context);
 			});
 		};
 
 		self.startDrag = function(mx, my) {
-			for(var i = 0; i < paths.length; i++) {
-				for(var j = 0; j < paths[i].points.length; j++) {
-					if(paths[i].points[j].hit(mx, my)) {
-						console.log("point was clicked");
+			for(var i = 0; i < shapes.length; i++) {
+				var points = shapes[i].getPoints();
+				for(var j = 0; j < points.length; j++) {
+					if(points[j].hit(mx, my)) {
+						console.log('point was clicked');
 						self.dragging = true;
-						selectedObject = paths[i].points[j];
+						selectedObject = points[j];
 						return true;
 					}
 				}
+				points = null;
 			}
 			return false;
 		};
 
+		self.stopDrag = function() {
+			self.dragging = false;
+			selectedObject = null;
+		};
+
 		self.moveDrag = function(mx, my) {
-			selectedObject.x = mx;
-			selectedObject.y = my;
+			selectedObject.moveTo(mx, my);
 		};
 
 		return self;

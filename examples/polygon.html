@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+<head>
+<title>Basic angular-image-mask usage</title>
+<script type="text/javascript" src="angular.js"></script>
+<script type="text/javascript" src="angular-image-mask.js"></script>
+<script>
+	var app = angular.module('MyApp', ['tjlaxs.aim']);
+	app.controller('BasicController', ['$scope', function($scope) {
+		$scope.paths = [
+			{
+				name: 'Polygon 1',
+				type: 'Polygon',
+				data: [ [100, 100],
+					[600, 50],
+					[500, 300],
+					[200, 400],
+					[50, 200]]
+			},
+			{
+				name: 'Line 1',
+				type: 'Line',
+				data: [ [30, 30],
+					[400, 450]]
+			},
+			{
+				name: 'Rectangle 1',
+				type: 'Rectangle',
+				data: [ [150, 150],
+					[300, 300]]
+			},
+		];
+	}]);
+</script>
+<style>
+.container { 
+    width:100%; height:100%; 
+    position:relative;
+}
+
+.bgimg { 
+    width:100%; height:100%; 
+    position:absolute; top:0px; left:0px;
+}
+
+.cnvs { 
+    width:100%; height:100%; 
+    position:absolute; top:0px; left:0px;
+    background-color: rgba(255,0,0,.1);
+}
+
+.outerContainer { 
+    width:640px; height:480px; 
+    margin: 0; 
+    border:1px solid blue;
+}
+</style>
+</head>
+
+<body ng-controller="BasicController">
+
+<h1>Mask</h1>
+<div class="outerContainer">
+<div class="container">
+<img class="bgimg" src="img/test.png" />
+<canvas class="cnvs" tjl-image-mask width="640" height="480" paths="paths"></canvas>
+</div>
+</div>
+
+<div><h2>Html</h2><pre>&lt;canvas tjl-image-mask width="640" height="480" paths="paths"&gt;&lt;/canvas&gt;</pre></div>
+
+<div><h2>Paths</h2><pre>{{paths | json}}</pre></div>
+
+</body>
+</html>
