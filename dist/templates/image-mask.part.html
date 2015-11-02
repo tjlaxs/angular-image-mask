@@ -1,0 +1,30 @@
+<div>
+	<div class="edit-mode">
+		<fieldset>
+			<legend>Editor</legend>
+			<label ng-repeat="mode in ['show', 'move', 'add', 'remove']">
+				<input type="radio" ng-model="config.control.mode" value="{{mode}}">{{mode}}
+			</label>
+			<div ng-show="config.control.mode == 'add'">
+				<input type="text" placeholder="Unique name required!" ng-model="config.control.selectedShape">
+				<button>Add polygon</button>
+			</div>
+		</fieldset>
+	
+		<fieldset>
+			<legend>Shapes</legend>
+			<div class="shape" ng-repeat="shape in config.paths track by $index">
+				<input type="radio" ng-model="config.control.selectedShape" value="{{shape.name}}">
+				<input type="text" value="{{shape.name}}">
+				<button>Remove</button>
+				<div class="point" ng-repeat="point in shape.data track by $index">
+					<div class="flex coords">
+						<input class="coord" type="number" ng-model="point[0]">
+						<input class="coord" type="number" ng-model="point[1]">
+						<button>Remove</button>
+					</div>
+				</div>
+			</div>
+		</fieldset>
+	</div>
+</div>

@@ -92,4 +92,15 @@
 		return ret;
 	});
 
+	aim.directive('tjlImageMaskControl', function() {
+		var ret = {
+			restrict: 'A',
+			templateUrl: 'templates/image-mask.part.html',
+			scope: {
+				config: '='
+			}
+		};
+
+		return ret;
+	});
 })();
