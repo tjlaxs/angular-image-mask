@@ -91,8 +91,15 @@
 	});
 
 	aim.directive('tjlImageMaskControl', function() {
+		function link(scope) {
+			if(angular.isUndefined(scope.config.mode)) {
+				scope.config.mode = 'edit';
+			}
+		}
+
 		var ret = {
 			restrict: 'E',
+			link: link,
 			templateUrl: 'templates/image-mask.part.html',
 			scope: {
 				config: '='

@@ -1,14 +1,12 @@
 <div>
 	<div class="edit-mode">
 		<fieldset>
-			<legend>Editor</legend>
-			<label ng-repeat="mode in ['show', 'move', 'add', 'remove']">
-				<input type="radio" ng-model="config.control.mode" value="{{mode}}">{{mode}}
-			</label>
-			<div ng-show="config.control.mode == 'add'">
-				<input type="text" placeholder="Unique name required!" ng-model="config.control.selectedShape">
-				<button>Add polygon</button>
-			</div>
+			<legend>Mode</legend>
+			<input type="radio" ng-model="config.control.mode" value="edit"> Edit<br>
+			<input type="radio" ng-model="config.control.mode" value="line"> Line<br>
+			<input type="radio" ng-model="config.control.mode" value="rect"> Rectangle<br>
+			<input type="radio" ng-model="config.control.mode" value="poly"> Polygon
+
 		</fieldset>
 	
 		<fieldset>
