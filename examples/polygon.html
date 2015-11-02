@@ -135,22 +135,7 @@ input.coord {
 <canvas class="cnvs" tjl-image-mask width="640" height="480" control="config.control" paths="config.paths"></canvas>
 </div>
 </div>
-<!--div class="mask-controller">
-<div class="shapes-controller">
-	<button>New polygon</button><br>
-	<button>Remove polygon</button><br>
-	<select name="shapeSelect" ng-model="paths.selectedShape" ng-options="shape.name for shape in paths track by shape.name">
-	</select>
-</div>
-<div class="shape-editor">
-	<p>Selected shape: {{paths.selectedShape}}</p>
-	<p>
-	<label for="shape-name">Name</label>
-	<input type="text" ng-model="paths.selectedShape.name">
-	</p>
-</div>
-</div-->
-<tjl-image-mask-control config="paths" />
+<tjl-image-mask-control config="config" />
 </div>
 
 <div><h2>Html</h2><pre>&lt;canvas tjl-image-mask width="640" height="480" control="config.control" paths="config.paths"&gt;&lt;/canvas&gt;</pre></div>

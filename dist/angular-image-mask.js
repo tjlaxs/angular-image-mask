@@ -8,9 +8,6 @@
 
 	var aim = angular.module('tjlaxs.aim', []);
 
-	aim.controller('imageMaskController', function() {
-	});
-
 	aim.directive('tjlImageMask', function() {
 		var ctx = null;
 		var canvas = null;
@@ -95,7 +92,7 @@
 
 	aim.directive('tjlImageMaskControl', function() {
 		var ret = {
-			restrict: 'A',
+			restrict: 'E',
 			templateUrl: 'templates/image-mask.part.html',
 			scope: {
 				config: '='
