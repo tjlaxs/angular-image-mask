@@ -27,7 +27,7 @@
 					mask = new Mask(scope.paths);
 					draw();
 				}
-			});
+			}, true);
 			canvas.addEventListener('mousedown', mouseDownListener, false);
 			canvas.addEventListener('mouseup', mouseUpListener, false);
 			bRect = canvas.getBoundingClientRect();
