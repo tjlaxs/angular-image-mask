@@ -25,11 +25,8 @@
 			mask = new Mask(scope.paths);
 			scope.$watch('paths', function(newValue) {
 				if(!angular.isUndefined(newValue)) {
-					console.log('hit');
 					mask = new Mask(scope.paths);
 					draw();
-				} else {
-					console.log('miss');
 				}
 			}, true);
 			canvas.addEventListener('mousedown', mouseDownListener, false);
