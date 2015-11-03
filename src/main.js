@@ -21,10 +21,10 @@
 			canvas = element[0];
 			ctx = canvas.getContext('2d');
 			ctx.strokeStyle = 'rgb(200, 20, 10)';
-			mask = new Mask(scope.paths);
-			scope.$watch('paths', function(newValue) {
+			mask = new Mask(scope.config.shapes);
+			scope.$watch('config.shapes', function(newValue) {
 				if(!angular.isUndefined(newValue)) {
-					mask = new Mask(scope.paths);
+					mask = new Mask(scope.config.shapes);
 					draw();
 				}
 			}, true);
@@ -82,7 +82,7 @@
 			restrict: 'A',
 			link: link,
 			scope: {
-				paths: '='
+				config: '='
 			}
 		};
 

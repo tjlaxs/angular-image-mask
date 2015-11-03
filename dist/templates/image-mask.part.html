@@ -11,7 +11,7 @@
 	
 		<fieldset>
 			<legend>Shapes</legend>
-			<div class="shape" ng-repeat="shape in config.paths track by $index">
+			<div class="shape" ng-repeat="shape in config.shapes track by $index">
 				<input type="radio" ng-model="config.control.selectedShape" value="{{shape.name}}">
 				<input type="text" value="{{shape.name}}">
 				<button>Remove</button>

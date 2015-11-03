@@ -18,7 +18,7 @@
 				pointFillColor: 'hsla(0, 100%, 100%, 0.3)'
 			}
 		};
-		$scope.config.paths = [
+		$scope.config.shapes = [
 			{
 				name: '1 point',
 				type: 'Polygon',
@@ -132,7 +132,7 @@ input.coord {
 <div class="outerContainer">
 <div class="container">
 <img class="bgimg" alt="Camera feed" src="img/test.png" />
-<canvas class="cnvs" tjl-image-mask width="640" height="480" control="config.control" paths="config.paths"></canvas>
+<canvas class="cnvs" tjl-image-mask width="640" height="480" config="config"></canvas>
 </div>
 </div>
 <tjl-image-mask-control config="config" />
