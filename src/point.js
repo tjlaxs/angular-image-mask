@@ -56,6 +56,10 @@
 			fillColor = color;
 		};
 
+		self.getJson = function() {
+			return json;
+		};
+
 		self.distance = function(px, py) {
 			var dx = px - x;
 			var dy = py - y;

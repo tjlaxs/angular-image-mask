@@ -11,8 +11,9 @@
 		/*
 		* Initialization
 		*/
-		
-		var json = conf;
+
+		// Default to supplied shape or empty polygon
+		var json = conf || {name: 'Shape', type: 'Polygon', data: []};
 		var name = conf.name;
 		var type = conf.type;
 		var points = [];
@@ -42,6 +43,11 @@
 
 		self.getPoints = function() {
 			return points;
+		};
+		self.addPoint = function(x, y) {
+			var point = new Point(x, y);
+			json.data.push(point.getJson());
+			points.push(point);
 		};
 
 		self.draw = function drawPoints(context) {

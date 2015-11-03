@@ -15,7 +15,9 @@
 		var json = shapeList;
 		var shapes = [];
 		var dragging = false;
-		var selectedObject = null;
+		var selectedShape = null;
+		var selectedPoint = null;
+		var addingMode = false;
 
 		/*
 		* Initialization
@@ -67,7 +69,7 @@
 				for(var j = 0; j < points.length; j++) {
 					if(points[j].hit(mx, my)) {
 						self.dragging = true;
-						selectedObject = points[j];
+						selectedPoint = points[j];
 						return true;
 					}
 				}
@@ -78,11 +80,31 @@
 
 		self.stopDrag = function() {
 			self.dragging = false;
-			selectedObject = null;
+			selectedShape = null;
 		};
 
 		self.moveDrag = function(mx, my) {
-			selectedObject.moveTo(mx, my);
+			selectedPoint.moveTo(mx, my);
+		};
+
+		self.startAddMode = function() {
+			addingMode = true;
+		};
+		self.endAddMode = function() {
+			addingMode = false;
+			selectedShape = null;
+		};
+
+		self.addPoint = function(mx, my) {
+			if(addingMode) {
+				return;
+			}
+			if(angular.isNull(selectedShape)) {
+				var poly = new Polygon();
+				selectedShape = poly;
+				shapes.push(poly);
+			}
+			selectedShape.addPoint(mx, my);
 		};
 
 		return self;

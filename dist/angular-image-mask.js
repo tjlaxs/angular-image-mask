@@ -46,8 +46,8 @@
 
 		function mouseDownListener(evt) {
 			updateMouse(evt.x, evt.y);
-			if(mask.startDrag(mouseX, mouseY)) {
-				canvas.addEventListener('mousemove', mouseMoveListener, false);
+			if(dirScope.config.mode === 'edit' && mask.startDrag(mouseX, mouseY)) {
+				canvas.addEventListener('mousemove', mouseEditMoveListener, false);
 			}
 
 			// Prevent event going further
@@ -59,7 +59,7 @@
 			}
 		}
 
-		function mouseMoveListener(evt) {
+		function mouseEditMoveListener(evt) {
 			if(mask.dragging) {
 				updateMouse(evt.x, evt.y);
 				mask.moveDrag(mouseX, mouseY);
@@ -70,7 +70,7 @@
 		function mouseUpListener(evt) {
 			updateMouse(evt.x, evt.y);
 			mask.stopDrag();
-			canvas.removeEventListener('mousemove', mouseMoveListener, false);
+			canvas.removeEventListener('mousemove', mouseEditMoveListener, false);
 			dirScope.$apply();
 		}
 
@@ -128,7 +128,9 @@
 		var json = shapeList;
 		var shapes = [];
 		var dragging = false;
-		var selectedObject = null;
+		var selectedShape = null;
+		var selectedPoint = null;
+		var addingMode = false;
 
 		/*
 		* Initialization
@@ -180,7 +182,7 @@
 				for(var j = 0; j < points.length; j++) {
 					if(points[j].hit(mx, my)) {
 						self.dragging = true;
-						selectedObject = points[j];
+						selectedPoint = points[j];
 						return true;
 					}
 				}
@@ -191,11 +193,31 @@
 
 		self.stopDrag = function() {
 			self.dragging = false;
-			selectedObject = null;
+			selectedShape = null;
 		};
 
 		self.moveDrag = function(mx, my) {
-			selectedObject.moveTo(mx, my);
+			selectedPoint.moveTo(mx, my);
+		};
+
+		self.startAddMode = function() {
+			addingMode = true;
+		};
+		self.endAddMode = function() {
+			addingMode = false;
+			selectedShape = null;
+		};
+
+		self.addPoint = function(mx, my) {
+			if(addingMode) {
+				return;
+			}
+			if(angular.isNull(selectedShape)) {
+				var poly = new Polygon();
+				selectedShape = poly;
+				shapes.push(poly);
+			}
+			selectedShape.addPoint(mx, my);
 		};
 
 		return self;
@@ -261,6 +283,10 @@
 		};
 		self.setFillColor = function(color) {
 			fillColor = color;
+		};
+
+		self.getJson = function() {
+			return json;
 		};
 
 		self.distance = function(px, py) {
@@ -366,8 +392,9 @@
 		/*
 		* Initialization
 		*/
-		
-		var json = conf;
+
+		// Default to supplied shape or empty polygon
+		var json = conf || {name: 'Shape', type: 'Polygon', data: []};
 		var name = conf.name;
 		var type = conf.type;
 		var points = [];
@@ -397,6 +424,11 @@
 
 		self.getPoints = function() {
 			return points;
+		};
+		self.addPoint = function(x, y) {
+			var point = new Point(x, y);
+			json.data.push(point.getJson());
+			points.push(point);
 		};
 
 		self.draw = function drawPoints(context) {

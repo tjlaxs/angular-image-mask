@@ -45,8 +45,8 @@
 
 		function mouseDownListener(evt) {
 			updateMouse(evt.x, evt.y);
-			if(mask.startDrag(mouseX, mouseY)) {
-				canvas.addEventListener('mousemove', mouseMoveListener, false);
+			if(dirScope.config.mode === 'edit' && mask.startDrag(mouseX, mouseY)) {
+				canvas.addEventListener('mousemove', mouseEditMoveListener, false);
 			}
 
 			// Prevent event going further
@@ -58,7 +58,7 @@
 			}
 		}
 
-		function mouseMoveListener(evt) {
+		function mouseEditMoveListener(evt) {
 			if(mask.dragging) {
 				updateMouse(evt.x, evt.y);
 				mask.moveDrag(mouseX, mouseY);
@@ -69,7 +69,7 @@
 		function mouseUpListener(evt) {
 			updateMouse(evt.x, evt.y);
 			mask.stopDrag();
-			canvas.removeEventListener('mousemove', mouseMoveListener, false);
+			canvas.removeEventListener('mousemove', mouseEditMoveListener, false);
 			dirScope.$apply();
 		}
 
