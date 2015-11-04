@@ -4,6 +4,7 @@
 	'use strict';
 
 	var Mask = require('./mask');
+	var EditControl = require('./editcontrol');
 
 	var aim = angular.module('tjlaxs.aim', []);
 
@@ -15,23 +16,7 @@
 		var mouseX = 0;
 		var mouseY = 0;
 		var dirScope = null;
-
-		function init(element, scope) {
-			dirScope = scope;
-			canvas = element[0];
-			ctx = canvas.getContext('2d');
-			ctx.strokeStyle = 'rgb(200, 20, 10)';
-			mask = new Mask(scope.config.shapes);
-			scope.$watch('config.shapes', function(newValue) {
-				if(!angular.isUndefined(newValue)) {
-					mask = new Mask(scope.config.shapes);
-					draw();
-				}
-			}, true);
-			canvas.addEventListener('mousedown', mouseDownListener, false);
-			canvas.addEventListener('mouseup', mouseUpListener, false);
-			bRect = canvas.getBoundingClientRect();
-		}
+		var controller;
 
 		function updateMouse(x, y) {
 			mouseX = (x - bRect.left) * (canvas.width / bRect.width);
@@ -41,11 +26,12 @@
 		function draw() {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			mask.draw(ctx);
+			console.log('draw');
 		}
 
 		function mouseDownListener(evt) {
 			updateMouse(evt.x, evt.y);
-			if(dirScope.config.mode === 'edit' && mask.startDrag(mouseX, mouseY)) {
+			if(dirScope.config.mode === 'edit' && controller.startDrag(mouseX, mouseY)) {
 				canvas.addEventListener('mousemove', mouseEditMoveListener, false);
 			}
 
@@ -59,22 +45,52 @@
 		}
 
 		function mouseEditMoveListener(evt) {
-			if(mask.dragging) {
+			if(controller.getDragging()) {
 				updateMouse(evt.x, evt.y);
-				mask.moveDrag(mouseX, mouseY);
+				controller.drag(mouseX, mouseY);
 				draw();
 			}
 		}
 
 		function mouseUpListener(evt) {
 			updateMouse(evt.x, evt.y);
-			mask.stopDrag();
+			controller.stopDrag(mouseX, mouseY);
 			canvas.removeEventListener('mousemove', mouseEditMoveListener, false);
 			dirScope.$apply();
 		}
 
 		function link(scope, element/*, attrs*/) {
-			init(element, scope);
+			dirScope = scope;
+			canvas = element[0];
+			ctx = canvas.getContext('2d');
+			ctx.strokeStyle = 'rgb(200, 20, 10)';
+
+			mask = new Mask(scope.config.shapes);
+			scope.$watch('config.shapes', function(newValue) {
+				if(!angular.isUndefined(newValue)) {
+					mask = new Mask(scope.config.shapes);
+					draw();
+					console.log('new mask');
+				}
+			}, true);
+
+			controller = new EditControl(dirScope, mask);
+			scope.$watch('config.mode', function(newValue) {
+				switch(newValue) {
+					case 'edit':
+						controller = new EditControl(dirScope, mask);
+						break;
+/*
+					case 'poly':
+						controller = new PolyControl(dirScope, mask);
+						break;
+*/
+				}
+			});
+
+			canvas.addEventListener('mousedown', mouseDownListener, false);
+			canvas.addEventListener('mouseup', mouseUpListener, false);
+			bRect = canvas.getBoundingClientRect();
 			draw();
 		}
 

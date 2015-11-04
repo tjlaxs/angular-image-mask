@@ -48,6 +48,10 @@
 		* Methods
 		*/
 
+		self.toString = function() {
+			return '(' + x + ', ' + y + ')';
+		};
+
 		self.setColor = function(color, fillColor) {
 			strokeColor = color;
 			self.setFillColor(fillColor);

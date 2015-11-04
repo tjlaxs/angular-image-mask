@@ -14,7 +14,6 @@
 
 		var json = shapeList;
 		var shapes = [];
-		var dragging = false;
 		var selectedShape = null;
 		var selectedPoint = null;
 		var addingMode = false;
@@ -23,7 +22,7 @@
 		* Initialization
 		*/
 
-		angular.forEach(shapeList, function(shape) {
+		angular.forEach(shapeList, function initializeShapes(shape) {
 			switch(shape.type) {
 				case 'Polygon':
 					shapes.push(new Polygon(shape));
@@ -50,16 +49,10 @@
 			return json;
 		};
 
-		self.getDragging = function() {
-			return dragging;
-		};
-		self.setDragging = function(val) {
-			dragging = val ? true : false;
-		};
-
 		self.draw = function(context) {
-			angular.forEach(shapes, function(shape) {
+			angular.forEach(shapes, function drawShapes(shape) {
 				shape.draw(context);
+				console.log('     draw');
 			});
 		};
 
@@ -68,7 +61,6 @@
 				var points = shapes[i].getPoints();
 				for(var j = 0; j < points.length; j++) {
 					if(points[j].hit(mx, my)) {
-						self.dragging = true;
 						selectedPoint = points[j];
 						return true;
 					}
@@ -79,12 +71,14 @@
 		};
 
 		self.stopDrag = function() {
-			self.dragging = false;
 			selectedShape = null;
 		};
 
-		self.moveDrag = function(mx, my) {
+		self.drag = function(mx, my) {
+			var debug = 'move: ' + selectedPoint.toString();
 			selectedPoint.moveTo(mx, my);
+			debug += ' -> ' + selectedPoint.toString();
+			console.log(debug);
 		};
 
 		self.startAddMode = function() {

@@ -18,7 +18,7 @@
 		var type = conf.type;
 		var points = [];
 
-		angular.forEach(conf.data, function(value) {
+		angular.forEach(conf.data, function initializePoints(value) {
 			points.push(new Point(value));
 		});
 	

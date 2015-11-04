@@ -1,10 +1,122 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /* jshint node:true */
+(function() {
+	'use strict';
+
+	function Control(scope, mask) {
+		var self = this;
+
+		/*
+		* Initialization
+		*/
+
+		console.log('new control');
+		var _scope = scope;
+		var _mask = mask;
+		var _dragging = false;
+		var _mouseX = null;
+		var _mouseY = null;
+	
+		/*
+		* Public methods
+		*/
+
+		self.getMask = function() {
+			return _mask;
+		};
+		self.getScope = function() {
+			return _scope;
+		};
+		self.getDragging = function() {
+			return _dragging;
+		};
+		self.setDragging = function(val) {
+			_dragging = !!val;
+		};
+
+		self.updateMouse = function(x, y) {
+			_mouseX = x;
+			_mouseY = y;
+		};
+	
+		// Called when dragging starts
+		self.startDrag = function(x, y) {
+			self.updateMouse(x, y);
+			return false;
+		};
+
+		// Called when dragging stops
+		self.stopDrag = function(x, y) {
+			self.updateMouse(x, y);
+		};
+
+		// Called while dragging
+		self.drag = function(x, y) {
+			self.updateMouse(x, y);
+		};
+
+		return self;
+	}
+
+	module.exports = Control;
+})();
+
+},{}],2:[function(require,module,exports){
+/* jshint node:true */
+(function() {
+	'use strict';
+
+	var Control = require('./control');
+
+	function EditControl(scope, mask) {
+		var self = this;
+
+		/*
+		* Initialization
+		*/
+
+		console.log('new edit control');
+		Control.call(self, scope, mask);
+
+		/*
+		* Public methods
+		*/
+
+		// Called when dragging starts
+		self.startDrag = function(x, y) {
+			if(self.getMask().startDrag(x, y)) {
+				self.setDragging(true);
+				return true;
+			}
+			return false;
+		};
+
+		// Called when dragging stops
+		self.stopDrag = function(x, y) {
+			self.getMask().stopDrag(x, y);
+			self.setDragging(false);
+		};
+
+		// Called while dragging
+		self.drag = function(x, y) {
+			self.getMask().drag(x, y);
+		};
+
+		return self;
+	}
+
+	module.exports = EditControl;
+})();
+
+
+},{"./control":1}],3:[function(require,module,exports){
+/* jshint node:true */
 /* globals angular */
 (function() {
 	'use strict';
 
 	var Mask = require('./mask');
+	var EditControl = require('./editcontrol');
 
 	var aim = angular.module('tjlaxs.aim', []);
 
@@ -16,23 +128,7 @@
 		var mouseX = 0;
 		var mouseY = 0;
 		var dirScope = null;
-
-		function init(element, scope) {
-			dirScope = scope;
-			canvas = element[0];
-			ctx = canvas.getContext('2d');
-			ctx.strokeStyle = 'rgb(200, 20, 10)';
-			mask = new Mask(scope.config.shapes);
-			scope.$watch('config.shapes', function(newValue) {
-				if(!angular.isUndefined(newValue)) {
-					mask = new Mask(scope.config.shapes);
-					draw();
-				}
-			}, true);
-			canvas.addEventListener('mousedown', mouseDownListener, false);
-			canvas.addEventListener('mouseup', mouseUpListener, false);
-			bRect = canvas.getBoundingClientRect();
-		}
+		var controller;
 
 		function updateMouse(x, y) {
 			mouseX = (x - bRect.left) * (canvas.width / bRect.width);
@@ -42,11 +138,12 @@
 		function draw() {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			mask.draw(ctx);
+			console.log('draw');
 		}
 
 		function mouseDownListener(evt) {
 			updateMouse(evt.x, evt.y);
-			if(dirScope.config.mode === 'edit' && mask.startDrag(mouseX, mouseY)) {
+			if(dirScope.config.mode === 'edit' && controller.startDrag(mouseX, mouseY)) {
 				canvas.addEventListener('mousemove', mouseEditMoveListener, false);
 			}
 
@@ -60,22 +157,52 @@
 		}
 
 		function mouseEditMoveListener(evt) {
-			if(mask.dragging) {
+			if(controller.getDragging()) {
 				updateMouse(evt.x, evt.y);
-				mask.moveDrag(mouseX, mouseY);
+				controller.drag(mouseX, mouseY);
 				draw();
 			}
 		}
 
 		function mouseUpListener(evt) {
 			updateMouse(evt.x, evt.y);
-			mask.stopDrag();
+			controller.stopDrag(mouseX, mouseY);
 			canvas.removeEventListener('mousemove', mouseEditMoveListener, false);
 			dirScope.$apply();
 		}
 
 		function link(scope, element/*, attrs*/) {
-			init(element, scope);
+			dirScope = scope;
+			canvas = element[0];
+			ctx = canvas.getContext('2d');
+			ctx.strokeStyle = 'rgb(200, 20, 10)';
+
+			mask = new Mask(scope.config.shapes);
+			scope.$watch('config.shapes', function(newValue) {
+				if(!angular.isUndefined(newValue)) {
+					mask = new Mask(scope.config.shapes);
+					draw();
+					console.log('new mask');
+				}
+			}, true);
+
+			controller = new EditControl(dirScope, mask);
+			scope.$watch('config.mode', function(newValue) {
+				switch(newValue) {
+					case 'edit':
+						controller = new EditControl(dirScope, mask);
+						break;
+/*
+					case 'poly':
+						controller = new PolyControl(dirScope, mask);
+						break;
+*/
+				}
+			});
+
+			canvas.addEventListener('mousedown', mouseDownListener, false);
+			canvas.addEventListener('mouseup', mouseUpListener, false);
+			bRect = canvas.getBoundingClientRect();
 			draw();
 		}
 
@@ -110,7 +237,7 @@
 	});
 })();
 
-},{"./mask":2}],2:[function(require,module,exports){
+},{"./editcontrol":2,"./mask":4}],4:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -127,7 +254,6 @@
 
 		var json = shapeList;
 		var shapes = [];
-		var dragging = false;
 		var selectedShape = null;
 		var selectedPoint = null;
 		var addingMode = false;
@@ -136,7 +262,7 @@
 		* Initialization
 		*/
 
-		angular.forEach(shapeList, function(shape) {
+		angular.forEach(shapeList, function initializeShapes(shape) {
 			switch(shape.type) {
 				case 'Polygon':
 					shapes.push(new Polygon(shape));
@@ -163,16 +289,10 @@
 			return json;
 		};
 
-		self.getDragging = function() {
-			return dragging;
-		};
-		self.setDragging = function(val) {
-			dragging = val ? true : false;
-		};
-
 		self.draw = function(context) {
-			angular.forEach(shapes, function(shape) {
+			angular.forEach(shapes, function drawShapes(shape) {
 				shape.draw(context);
+				console.log('     draw');
 			});
 		};
 
@@ -181,7 +301,6 @@
 				var points = shapes[i].getPoints();
 				for(var j = 0; j < points.length; j++) {
 					if(points[j].hit(mx, my)) {
-						self.dragging = true;
 						selectedPoint = points[j];
 						return true;
 					}
@@ -192,12 +311,14 @@
 		};
 
 		self.stopDrag = function() {
-			self.dragging = false;
 			selectedShape = null;
 		};
 
-		self.moveDrag = function(mx, my) {
+		self.drag = function(mx, my) {
+			var debug = 'move: ' + selectedPoint.toString();
 			selectedPoint.moveTo(mx, my);
+			debug += ' -> ' + selectedPoint.toString();
+			console.log(debug);
 		};
 
 		self.startAddMode = function() {
@@ -226,7 +347,7 @@
 	module.exports = Mask;
 })();
 
-},{"./polygon":4}],3:[function(require,module,exports){
+},{"./polygon":6}],5:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -276,6 +397,10 @@
 		/*
 		* Methods
 		*/
+
+		self.toString = function() {
+			return '(' + x + ', ' + y + ')';
+		};
 
 		self.setColor = function(color, fillColor) {
 			strokeColor = color;
@@ -327,7 +452,7 @@
 	module.exports = Point;
 })();
 
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -378,7 +503,7 @@
 	module.exports = Polygon;
 })();
 
-},{"./shape":5}],5:[function(require,module,exports){
+},{"./shape":7}],7:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -399,7 +524,7 @@
 		var type = conf.type;
 		var points = [];
 
-		angular.forEach(conf.data, function(value) {
+		angular.forEach(conf.data, function initializePoints(value) {
 			points.push(new Point(value));
 		});
 	
@@ -443,4 +568,4 @@
 	module.exports = Shape;
 })();
 
-},{"./point":3}]},{},[1]);
+},{"./point":5}]},{},[3]);
