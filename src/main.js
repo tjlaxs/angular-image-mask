@@ -70,7 +70,7 @@
 			mask = new Mask(scope.config.shapes);
 			scope.$watch('config.shapes', function(newValue) {
 				if(!angular.isUndefined(newValue)) {
-					mask = new Mask(scope.config.shapes);
+					mask.setConfig(scope.config.shapes);
 					draw();
 				}
 			}, true);

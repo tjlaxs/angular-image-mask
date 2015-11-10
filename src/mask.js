@@ -19,34 +19,34 @@
 		var addingMode = false;
 
 		/*
-		* Initialization
-		*/
-
-		angular.forEach(shapeList, function initializeShapes(shape) {
-			switch(shape.type) {
-				case 'Polygon':
-					shapes.push(new Polygon(shape));
-					break;
-				/*
-				case 'Line':
-					shapes.push(new Line(shape));
-					break;
-				case 'Rectangle':
-					shapes.push(new Rectangle(shape));
-					break;
-				*/
-				default:
-					console.warn('Unknown shape: ' + shape.type);
-					break;
-			}
-		});
-
-		/*
 		* Methods
 		*/
 
 		self.getJson = function getJson() {
 			return json;
+		};
+
+		self.setConfig = function setConfig(config) {
+			shapes = [];
+			angular.forEach(config, function initializeShapes(shape) {
+				switch(shape.type) {
+					case 'Polygon':
+						shapes.push(new Polygon(shape));
+						break;
+					/*
+					case 'Line':
+						shapes.push(new Line(shape));
+						break;
+					case 'Rectangle':
+						shapes.push(new Rectangle(shape));
+						break;
+					*/
+					default:
+						console.warn('Unknown shape: ' + shape.type);
+						break;
+				}
+			});
+
 		};
 
 		self.draw = function(context) {
@@ -101,6 +101,12 @@
 			}
 			selectedShape.addPoint(mx, my);
 		};
+
+		/*
+		* Initialization
+		*/
+
+		self.setConfig(shapeList);
 
 		return self;
 	}
