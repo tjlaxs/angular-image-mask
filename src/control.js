@@ -32,6 +32,9 @@
 			_dragging = !!val;
 		};
 
+		self.init = function() {console.log('init');};
+		self.deinit = function() {console.log('deinit');};
+
 		self.updateMouse = function(x, y) {
 			_mouseX = x;
 			_mouseY = y;

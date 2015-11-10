@@ -85,16 +85,29 @@
 			selectedShape = null;
 		};
 
+		self.addShape = function(shape) {
+			shapes.push(shape);
+		};
+
+		self.getSelectedShape = function() {
+			return selectedShape;
+		};
+
+		self.setSelectedShape = function(shape) {
+			selectedShape = shape;
+		};
+
+		self.getSelectedPoint = function() {
+			return selectedPoint;
+		};
+
+		self.setSelectedPoint = function(point) {
+			selectedPoint = point;
+		};
+
 		self.addPoint = function(mx, my) {
-			if(addingMode) {
-				return;
-			}
-			if(angular.isNull(selectedShape)) {
-				var poly = new Polygon();
-				selectedShape = poly;
-				shapes.push(poly);
-			}
-			selectedShape.addPoint(mx, my);
+			selectedPoint = selectedShape.addPoint(mx, my);
+			return true;
 		};
 
 		/*

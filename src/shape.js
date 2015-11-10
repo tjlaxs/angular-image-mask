@@ -8,20 +8,12 @@
 	function Shape(conf) {
 		var self = this;
 
-		/*
-		* Initialization
-		*/
-
 		// Default to supplied shape or empty polygon
 		var json = conf || {name: 'Shape', type: 'Polygon', data: []};
-		var name = conf.name;
-		var type = conf.type;
+		var name = json.name;
+		var type = json.type;
 		var points = [];
 
-		angular.forEach(conf.data, function initializePoints(value) {
-			points.push(new Point(value));
-		});
-	
 		/*
 		* Public methods
 		*/
@@ -55,6 +47,14 @@
 				point.draw(context);
 			});
 		};
+	
+		/*
+		* Initialization
+		*/
+
+		angular.forEach(json.data, function initializePoints(value) {
+			points.push(new Point(value));
+		});
 	
 		return self;
 	}

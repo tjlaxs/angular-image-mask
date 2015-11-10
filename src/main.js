@@ -19,9 +19,9 @@
 		var dirScope = null;
 		var controller;
 
-		function updateMouse(x, y) {
-			mouseX = (x - bRect.left) * (canvas.width / bRect.width);
-			mouseY = (y - bRect.top) * (canvas.height / bRect.height);
+		function updateMouse(evt) {
+			mouseX = (evt.x - bRect.left) * (canvas.width / bRect.width);
+			mouseY = (evt.y - bRect.top) * (canvas.height / bRect.height);
 		}
 
 		function draw() {
@@ -30,7 +30,7 @@
 		}
 
 		function mouseDownListener(evt) {
-			updateMouse(evt.x, evt.y);
+			updateMouse(evt);
 			if(controller.startDrag(mouseX, mouseY)) {
 				canvas.addEventListener('mousemove', mouseEditMoveListener, false);
 			}
@@ -46,14 +46,14 @@
 
 		function mouseEditMoveListener(evt) {
 			if(controller.getDragging()) {
-				updateMouse(evt.x, evt.y);
+				updateMouse(evt);
 				controller.drag(mouseX, mouseY);
 				draw();
 			}
 		}
 
 		function mouseUpListener(evt) {
-			updateMouse(evt.x, evt.y);
+			updateMouse(evt);
 			controller.stopDrag(mouseX, mouseY);
 			canvas.removeEventListener('mousemove', mouseEditMoveListener, false);
 			dirScope.$apply();
@@ -75,6 +75,7 @@
 
 			controller = new EditControl(dirScope, mask);
 			scope.$watch('config.control.mode', function(newValue) {
+				var old = controller;
 				switch(newValue) {
 					case 'edit':
 						controller = new EditControl(dirScope, mask);
@@ -82,7 +83,13 @@
 					case 'poly':
 						controller = new PolyControl(dirScope, mask);
 						break;
+					default:
+						return;
 				}
+				console.log(old);
+				old.deinit();
+				console.log(controller);
+				controller.init();
 			});
 
 			canvas.addEventListener('mousedown', mouseDownListener, false);
