@@ -4,7 +4,7 @@
 
 	var Control = require('./control');
 
-	function EditControl(scope, mask) {
+	function PolyControl(scope, mask) {
 		var self = this;
 
 		/*
@@ -40,6 +40,6 @@
 		return self;
 	}
 
-	module.exports = EditControl;
+	module.exports = PolyControl;
 })();
 

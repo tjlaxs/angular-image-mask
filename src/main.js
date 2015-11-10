@@ -5,6 +5,7 @@
 
 	var Mask = require('./mask');
 	var EditControl = require('./editcontrol');
+	var PolyControl = require('./polycontrol');
 
 	var aim = angular.module('tjlaxs.aim', []);
 
@@ -30,7 +31,7 @@
 
 		function mouseDownListener(evt) {
 			updateMouse(evt.x, evt.y);
-			if(dirScope.config.mode === 'edit' && controller.startDrag(mouseX, mouseY)) {
+			if(controller.startDrag(mouseX, mouseY)) {
 				canvas.addEventListener('mousemove', mouseEditMoveListener, false);
 			}
 
@@ -46,11 +47,8 @@
 		function mouseEditMoveListener(evt) {
 			if(controller.getDragging()) {
 				updateMouse(evt.x, evt.y);
-				console.log('starting to drag');
 				controller.drag(mouseX, mouseY);
-				console.log('stopping drag and starting draw');
 				draw();
-				console.log('stopping draw');
 			}
 		}
 
@@ -76,16 +74,14 @@
 			}, true);
 
 			controller = new EditControl(dirScope, mask);
-			scope.$watch('config.mode', function(newValue) {
+			scope.$watch('config.control.mode', function(newValue) {
 				switch(newValue) {
 					case 'edit':
 						controller = new EditControl(dirScope, mask);
 						break;
-/*
 					case 'poly':
 						controller = new PolyControl(dirScope, mask);
 						break;
-*/
 				}
 			});
 
@@ -108,7 +104,7 @@
 
 	aim.directive('tjlImageMaskControl', function() {
 		function link(scope) {
-			if(angular.isUndefined(scope.config.mode)) {
+			if(angular.isUndefined(scope.config.control.mode)) {
 				scope.config.mode = 'edit';
 			}
 		}

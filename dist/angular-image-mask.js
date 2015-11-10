@@ -10,7 +10,6 @@
 		* Initialization
 		*/
 
-		console.log('new control');
 		var _scope = scope;
 		var _mask = mask;
 		var _dragging = false;
@@ -75,7 +74,6 @@
 		* Initialization
 		*/
 
-		console.log('new edit control');
 		Control.call(self, scope, mask);
 
 		/*
@@ -84,9 +82,7 @@
 
 		// Called when dragging starts
 		self.startDrag = function(x, y) {
-			console.log('in editcontrol.startDrag');
 			if(self.getMask().startDrag(x, y)) {
-				console.log('start drag');
 				self.setDragging(true);
 				return true;
 			}
@@ -95,14 +91,12 @@
 
 		// Called when dragging stops
 		self.stopDrag = function(x, y) {
-			console.log('in editcontrol.stopDrag');
 			self.getMask().stopDrag(x, y);
 			self.setDragging(false);
 		};
 
 		// Called while dragging
 		self.drag = function(x, y) {
-			console.log('in editcontrol.drag');
 			self.getMask().drag(x, y);
 		};
 
@@ -121,6 +115,7 @@
 
 	var Mask = require('./mask');
 	var EditControl = require('./editcontrol');
+	var PolyControl = require('./polycontrol');
 
 	var aim = angular.module('tjlaxs.aim', []);
 
@@ -146,7 +141,7 @@
 
 		function mouseDownListener(evt) {
 			updateMouse(evt.x, evt.y);
-			if(dirScope.config.mode === 'edit' && controller.startDrag(mouseX, mouseY)) {
+			if(controller.startDrag(mouseX, mouseY)) {
 				canvas.addEventListener('mousemove', mouseEditMoveListener, false);
 			}
 
@@ -162,11 +157,8 @@
 		function mouseEditMoveListener(evt) {
 			if(controller.getDragging()) {
 				updateMouse(evt.x, evt.y);
-				console.log('starting to drag');
 				controller.drag(mouseX, mouseY);
-				console.log('stopping drag and starting draw');
 				draw();
-				console.log('stopping draw');
 			}
 		}
 
@@ -192,16 +184,14 @@
 			}, true);
 
 			controller = new EditControl(dirScope, mask);
-			scope.$watch('config.mode', function(newValue) {
+			scope.$watch('config.control.mode', function(newValue) {
 				switch(newValue) {
 					case 'edit':
 						controller = new EditControl(dirScope, mask);
 						break;
-/*
 					case 'poly':
 						controller = new PolyControl(dirScope, mask);
 						break;
-*/
 				}
 			});
 
@@ -224,7 +214,7 @@
 
 	aim.directive('tjlImageMaskControl', function() {
 		function link(scope) {
-			if(angular.isUndefined(scope.config.mode)) {
+			if(angular.isUndefined(scope.config.control.mode)) {
 				scope.config.mode = 'edit';
 			}
 		}
@@ -242,7 +232,7 @@
 	});
 })();
 
-},{"./editcontrol":2,"./mask":4}],4:[function(require,module,exports){
+},{"./editcontrol":2,"./mask":4,"./polycontrol":6}],4:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -319,12 +309,7 @@
 		};
 
 		self.drag = function(mx, my) {
-			console.log(shapes[0].getPoints()[0].getJson());
-			var debug = 'move: ' + selectedPoint.toString();
 			selectedPoint.moveTo(mx, my);
-			debug += ' -> ' + selectedPoint.toString();
-			console.log(debug);
-			console.log(shapes[0].getPoints()[0].getJson());
 		};
 
 		self.startAddMode = function() {
@@ -359,7 +344,7 @@
 	module.exports = Mask;
 })();
 
-},{"./polygon":6}],5:[function(require,module,exports){
+},{"./polygon":7}],5:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -451,7 +436,6 @@
 			context.strokeStyle = strokeColor;
 			context.fillStyle = fillColor;
 			context.beginPath();
-			console.log(x + ',' + y);
 			context.arc(x, y, r, 0, Math.PI*2, true);
 			context.stroke();
 			context.fill();
@@ -466,6 +450,53 @@
 })();
 
 },{}],6:[function(require,module,exports){
+/* jshint node:true */
+(function() {
+	'use strict';
+
+	var Control = require('./control');
+
+	function PolyControl(scope, mask) {
+		var self = this;
+
+		/*
+		* Initialization
+		*/
+
+		Control.call(self, scope, mask);
+
+		/*
+		* Public methods
+		*/
+
+		// Called when dragging starts
+		self.startDrag = function(x, y) {
+			if(self.getMask().startDrag(x, y)) {
+				self.setDragging(true);
+				return true;
+			}
+			return false;
+		};
+
+		// Called when dragging stops
+		self.stopDrag = function(x, y) {
+			self.getMask().stopDrag(x, y);
+			self.setDragging(false);
+		};
+
+		// Called while dragging
+		self.drag = function(x, y) {
+			self.getMask().drag(x, y);
+		};
+
+		return self;
+	}
+
+	module.exports = PolyControl;
+})();
+
+
+},{"./control":1}],7:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -496,7 +527,6 @@
 			var points = self.getPoints();
 			context.beginPath();
 			context.moveTo(points[0].x, points[0].y);
-			console.log('draw polygon starting from: ' + points[0].x + ',' + points[0].y);
 			for(var i = 1; i < points.length; i++) {
 				context.lineTo(points[i].x, points[i].y);
 			}
@@ -517,7 +547,7 @@
 	module.exports = Polygon;
 })();
 
-},{"./shape":7}],7:[function(require,module,exports){
+},{"./shape":8}],8:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {

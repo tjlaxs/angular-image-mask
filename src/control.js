@@ -9,7 +9,6 @@
 		* Initialization
 		*/
 
-		console.log('new control');
 		var _scope = scope;
 		var _mask = mask;
 		var _dragging = false;
