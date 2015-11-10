@@ -11,6 +11,8 @@
 		*/
 
 		var self = this;
+		var strokeColor = '#ffffff';
+		var fillColor = 'rgba(0, 0, 0, 0.3)';
 		Shape.call(self, conf);
 
 		/*
@@ -18,19 +20,27 @@
 		*/
 
 		self.draw = function(context) {
+			var savedColor = context.strokeStyle;
+			var savedFillColor = context.fillStyle;
+			context.strokeStyle = strokeColor;
+			context.fillStyle = fillColor;
+
 			var points = self.getPoints();
 			context.beginPath();
 			context.moveTo(points[0].x, points[0].y);
+			console.log('draw polygon starting from: ' + points[0].x + ',' + points[0].y);
 			for(var i = 1; i < points.length; i++) {
 				context.lineTo(points[i].x, points[i].y);
 			}
 			context.closePath();
 			context.stroke();
-			context.fillStyle = 'hsla(120,100%,75%, 0.3';
 			context.fill();
 			angular.forEach(points, function drawPoint(point) {
 				point.draw(context);
 			});
+
+			context.strokeStyle = savedColor;
+			context.fillStyle = savedFillColor;
 		};
 
 		return self;

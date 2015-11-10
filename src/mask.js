@@ -14,31 +14,9 @@
 
 		var json = shapeList;
 		var shapes = [];
-		var dragging = false;
-		var selectedObject = null;
-
-		/*
-		* Initialization
-		*/
-
-		angular.forEach(shapeList, function(shape) {
-			switch(shape.type) {
-				case 'Polygon':
-					shapes.push(new Polygon(shape));
-					break;
-				/*
-				case 'Line':
-					shapes.push(new Line(shape));
-					break;
-				case 'Rectangle':
-					shapes.push(new Rectangle(shape));
-					break;
-				*/
-				default:
-					console.warn('Unknown shape: ' + shape.type);
-					break;
-			}
-		});
+		var selectedShape = null;
+		var selectedPoint = null;
+		var addingMode = false;
 
 		/*
 		* Methods
@@ -48,16 +26,31 @@
 			return json;
 		};
 
-		self.getDragging = function() {
-			return dragging;
-		};
-		self.setDragging = function(val) {
-			dragging = val ? true : false;
+		self.setConfig = function setConfig(config) {
+			shapes = [];
+			angular.forEach(config, function initializeShapes(shape) {
+				switch(shape.type) {
+					case 'Polygon':
+						shapes.push(new Polygon(shape));
+						break;
+					/*
+					case 'Line':
+						shapes.push(new Line(shape));
+						break;
+					case 'Rectangle':
+						shapes.push(new Rectangle(shape));
+						break;
+					*/
+					default:
+						console.warn('Unknown shape: ' + shape.type);
+						break;
+				}
+			});
+
 		};
 
 		self.draw = function(context) {
-			console.log(self);
-			angular.forEach(shapes, function(shape) {
+			angular.forEach(shapes, function drawShapes(shape) {
 				shape.draw(context);
 			});
 		};
@@ -67,9 +60,7 @@
 				var points = shapes[i].getPoints();
 				for(var j = 0; j < points.length; j++) {
 					if(points[j].hit(mx, my)) {
-						console.log('point was clicked');
-						self.dragging = true;
-						selectedObject = points[j];
+						selectedPoint = points[j];
 						return true;
 					}
 				}
@@ -79,13 +70,43 @@
 		};
 
 		self.stopDrag = function() {
-			self.dragging = false;
-			selectedObject = null;
+			selectedShape = null;
 		};
 
-		self.moveDrag = function(mx, my) {
-			selectedObject.moveTo(mx, my);
+		self.drag = function(mx, my) {
+			console.log(shapes[0].getPoints()[0].getJson());
+			var debug = 'move: ' + selectedPoint.toString();
+			selectedPoint.moveTo(mx, my);
+			debug += ' -> ' + selectedPoint.toString();
+			console.log(debug);
+			console.log(shapes[0].getPoints()[0].getJson());
 		};
+
+		self.startAddMode = function() {
+			addingMode = true;
+		};
+		self.endAddMode = function() {
+			addingMode = false;
+			selectedShape = null;
+		};
+
+		self.addPoint = function(mx, my) {
+			if(addingMode) {
+				return;
+			}
+			if(angular.isNull(selectedShape)) {
+				var poly = new Polygon();
+				selectedShape = poly;
+				shapes.push(poly);
+			}
+			selectedShape.addPoint(mx, my);
+		};
+
+		/*
+		* Initialization
+		*/
+
+		self.setConfig(shapeList);
 
 		return self;
 	}

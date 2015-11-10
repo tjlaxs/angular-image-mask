@@ -4,11 +4,9 @@
 	'use strict';
 
 	var Mask = require('./mask');
+	var EditControl = require('./editcontrol');
 
 	var aim = angular.module('tjlaxs.aim', []);
-
-	aim.controller('imageMaskController', function() {
-	});
 
 	aim.directive('tjlImageMask', function() {
 		var ctx = null;
@@ -17,18 +15,8 @@
 		var bRect = null;
 		var mouseX = 0;
 		var mouseY = 0;
-		var rootScope = null;
-
-		function init(element, scope) {
-			rootScope = scope;
-			canvas = element[0];
-			ctx = canvas.getContext('2d');
-			ctx.strokeStyle = 'rgb(200, 20, 10)';
-			mask = new Mask(scope.paths);
-			canvas.addEventListener('mousedown', mouseDownListener, false);
-			canvas.addEventListener('mouseup', mouseUpListener, false);
-			bRect = canvas.getBoundingClientRect();
-		}
+		var dirScope = null;
+		var controller;
 
 		function updateMouse(x, y) {
 			mouseX = (x - bRect.left) * (canvas.width / bRect.width);
@@ -42,8 +30,8 @@
 
 		function mouseDownListener(evt) {
 			updateMouse(evt.x, evt.y);
-			if(mask.startDrag(mouseX, mouseY)) {
-				canvas.addEventListener('mousemove', mouseMoveListener, false);
+			if(dirScope.config.mode === 'edit' && controller.startDrag(mouseX, mouseY)) {
+				canvas.addEventListener('mousemove', mouseEditMoveListener, false);
 			}
 
 			// Prevent event going further
@@ -55,28 +43,55 @@
 			}
 		}
 
-		function mouseMoveListener(evt) {
-			if(mask.dragging) {
+		function mouseEditMoveListener(evt) {
+			if(controller.getDragging()) {
 				updateMouse(evt.x, evt.y);
-				mask.moveDrag(mouseX, mouseY);
+				console.log('starting to drag');
+				controller.drag(mouseX, mouseY);
+				console.log('stopping drag and starting draw');
 				draw();
+				console.log('stopping draw');
 			}
 		}
 
 		function mouseUpListener(evt) {
 			updateMouse(evt.x, evt.y);
-			mask.stopDrag();
-			canvas.removeEventListener('mousemove', mouseMoveListener, false);
-			console.log('UP');
-			console.log(rootScope.paths);
-			rootScope.$digest();
+			controller.stopDrag(mouseX, mouseY);
+			canvas.removeEventListener('mousemove', mouseEditMoveListener, false);
+			dirScope.$apply();
 		}
 
 		function link(scope, element/*, attrs*/) {
-			init(element, scope);
-			scope.$watch('paths', function() {
-				console.log(scope.paths);
+			dirScope = scope;
+			canvas = element[0];
+			ctx = canvas.getContext('2d');
+			ctx.strokeStyle = 'rgb(200, 20, 10)';
+
+			mask = new Mask(scope.config.shapes);
+			scope.$watch('config.shapes', function(newValue) {
+				if(!angular.isUndefined(newValue)) {
+					mask.setConfig(scope.config.shapes);
+					draw();
+				}
+			}, true);
+
+			controller = new EditControl(dirScope, mask);
+			scope.$watch('config.mode', function(newValue) {
+				switch(newValue) {
+					case 'edit':
+						controller = new EditControl(dirScope, mask);
+						break;
+/*
+					case 'poly':
+						controller = new PolyControl(dirScope, mask);
+						break;
+*/
+				}
 			});
+
+			canvas.addEventListener('mousedown', mouseDownListener, false);
+			canvas.addEventListener('mouseup', mouseUpListener, false);
+			bRect = canvas.getBoundingClientRect();
 			draw();
 		}
 
@@ -84,11 +99,29 @@
 			restrict: 'A',
 			link: link,
 			scope: {
-				paths: '='
+				config: '='
 			}
 		};
 
 		return ret;
 	});
 
+	aim.directive('tjlImageMaskControl', function() {
+		function link(scope) {
+			if(angular.isUndefined(scope.config.mode)) {
+				scope.config.mode = 'edit';
+			}
+		}
+
+		var ret = {
+			restrict: 'E',
+			link: link,
+			templateUrl: 'templates/image-mask.part.html',
+			scope: {
+				config: '='
+			}
+		};
+
+		return ret;
+	});
 })();

@@ -7,7 +7,33 @@
 <script>
 	var app = angular.module('MyApp', ['tjlaxs.aim']);
 	app.controller('BasicController', ['$scope', function($scope) {
-		$scope.paths = [
+		$scope.config = {};
+		$scope.config.control = {
+			mode: 'edit',
+			visualConfig: {
+				lineWidth: 1,
+				lineColor: '#ffffff',
+				fillColor: 'hsla(0, 100%, 100%, 0.3)',
+				pointBorderColor: '#ffffff',
+				pointFillColor: 'hsla(0, 100%, 100%, 0.3)'
+			}
+		};
+		$scope.config.shapes = [
+			{
+				name: '1 point',
+				type: 'Polygon',
+				data: [ [120, 120]]
+			},
+			{
+				name: '2 point',
+				type: 'Polygon',
+				data: [ [20, 20], [40, 20]]
+			},
+			{
+				name: '3 point',
+				type: 'Polygon',
+				data: [ [120, 20], [140, 20], [140, 120]]
+			},
 			{
 				name: 'Polygon 1',
 				type: 'Polygon',
@@ -16,6 +42,15 @@
 					[500, 300],
 					[200, 400],
 					[50, 200]]
+			},
+			{
+				name: 'Polygon 2',
+				type: 'Polygon',
+				data: [ [140, 140],
+					[500, 90],
+					[540, 340],
+					[240, 440],
+					[90, 240]]
 			},
 			{
 				name: 'Line 1',
@@ -28,48 +63,87 @@
 				type: 'Rectangle',
 				data: [ [150, 150],
 					[300, 300]]
-			},
+			}
 		];
 	}]);
 </script>
 <style>
-.container { 
-    width:100%; height:100%; 
-    position:relative;
+.container {
+	width:100%; height:100%;
+	position:relative;
 }
 
-.bgimg { 
-    width:100%; height:100%; 
-    position:absolute; top:0px; left:0px;
+.bgimg {
+	width:100%; height:100%;
+	position:absolute; top:0px; left:0px;
 }
 
-.cnvs { 
-    width:100%; height:100%; 
-    position:absolute; top:0px; left:0px;
-    background-color: rgba(255,0,0,.1);
+.cnvs {
+	width:100%; height:100%;
+	position:absolute; top:0px; left:0px;
+	background-color: rgba(255,0,0,.1);
 }
 
-.outerContainer { 
-    width:640px; height:480px; 
-    margin: 0; 
-    border:1px solid blue;
+.outerContainer {
+	width:640px; height:480px;
+	margin: 0;
+	border:1px solid blue;
 }
+
+.mask-controller {
+	display: flex;
+	flex-direction: row;
+}
+
+.app-container {
+	display: flex;
+	flex-direction: row;
+}
+
+.flex {
+	display: flex;
+	flex-direction: row;
+}
+
+div.shape {
+	padding: 3px;
+}
+
+div.point {
+	padding-left: 5px;
+}
+
+div.flex.coords {
+	padding-left: 50px;
+}
+
+input.coord {
+	padding-left: 5px;
+	width: 3em;
+}
+
 </style>
 </head>
 
 <body ng-controller="BasicController">
 
 <h1>Mask</h1>
+<div class="app-container">
 <div class="outerContainer">
 <div class="container">
-<img class="bgimg" src="img/test.png" />
-<canvas class="cnvs" tjl-image-mask width="640" height="480" paths="paths"></canvas>
+<img class="bgimg" alt="Camera feed" src="img/test.png" />
+<canvas class="cnvs" tjl-image-mask width="640" height="480" config="config"></canvas>
 </div>
 </div>
+<tjl-image-mask-control config="config" />
+</div>
 
-<div><h2>Html</h2><pre>&lt;canvas tjl-image-mask width="640" height="480" paths="paths"&gt;&lt;/canvas&gt;</pre></div>
+<div><h2>Html</h2><pre>&lt;canvas class="cnvs" tjl-image-mask width="640" height="480" config="config"&gt;&lt;/canvas&gt;
+&lt;tjl-image-mask-control config="config" /&gt;
+</pre></div>
 
-<div><h2>Paths</h2><pre>{{paths | json}}</pre></div>
+<div><h2>Control</h2><pre>{{config.control | json}}</pre></div>
+<div><h2>Shapes</h2><pre>{{config.shapes | json}}</pre></div>
 
 </body>
 </html>
