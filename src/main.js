@@ -26,7 +26,6 @@
 		function draw() {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			mask.draw(ctx);
-			console.log('draw');
 		}
 
 		function mouseDownListener(evt) {
@@ -47,8 +46,11 @@
 		function mouseEditMoveListener(evt) {
 			if(controller.getDragging()) {
 				updateMouse(evt.x, evt.y);
+				console.log('starting to drag');
 				controller.drag(mouseX, mouseY);
+				console.log('stopping drag and starting draw');
 				draw();
+				console.log('stopping draw');
 			}
 		}
 
@@ -70,7 +72,6 @@
 				if(!angular.isUndefined(newValue)) {
 					mask = new Mask(scope.config.shapes);
 					draw();
-					console.log('new mask');
 				}
 			}, true);
 

@@ -84,7 +84,9 @@
 
 		// Called when dragging starts
 		self.startDrag = function(x, y) {
+			console.log('in editcontrol.startDrag');
 			if(self.getMask().startDrag(x, y)) {
+				console.log('start drag');
 				self.setDragging(true);
 				return true;
 			}
@@ -93,12 +95,14 @@
 
 		// Called when dragging stops
 		self.stopDrag = function(x, y) {
+			console.log('in editcontrol.stopDrag');
 			self.getMask().stopDrag(x, y);
 			self.setDragging(false);
 		};
 
 		// Called while dragging
 		self.drag = function(x, y) {
+			console.log('in editcontrol.drag');
 			self.getMask().drag(x, y);
 		};
 
@@ -138,7 +142,6 @@
 		function draw() {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			mask.draw(ctx);
-			console.log('draw');
 		}
 
 		function mouseDownListener(evt) {
@@ -159,8 +162,11 @@
 		function mouseEditMoveListener(evt) {
 			if(controller.getDragging()) {
 				updateMouse(evt.x, evt.y);
+				console.log('starting to drag');
 				controller.drag(mouseX, mouseY);
+				console.log('stopping drag and starting draw');
 				draw();
+				console.log('stopping draw');
 			}
 		}
 
@@ -182,7 +188,6 @@
 				if(!angular.isUndefined(newValue)) {
 					mask = new Mask(scope.config.shapes);
 					draw();
-					console.log('new mask');
 				}
 			}, true);
 
@@ -292,7 +297,6 @@
 		self.draw = function(context) {
 			angular.forEach(shapes, function drawShapes(shape) {
 				shape.draw(context);
-				console.log('     draw');
 			});
 		};
 
@@ -315,10 +319,12 @@
 		};
 
 		self.drag = function(mx, my) {
+			console.log(shapes[0].getPoints()[0].getJson());
 			var debug = 'move: ' + selectedPoint.toString();
 			selectedPoint.moveTo(mx, my);
 			debug += ' -> ' + selectedPoint.toString();
 			console.log(debug);
+			console.log(shapes[0].getPoints()[0].getJson());
 		};
 
 		self.startAddMode = function() {
@@ -439,6 +445,7 @@
 			context.strokeStyle = strokeColor;
 			context.fillStyle = fillColor;
 			context.beginPath();
+			console.log(x + ',' + y);
 			context.arc(x, y, r, 0, Math.PI*2, true);
 			context.stroke();
 			context.fill();
@@ -483,6 +490,7 @@
 			var points = self.getPoints();
 			context.beginPath();
 			context.moveTo(points[0].x, points[0].y);
+			console.log('draw polygon starting from: ' + points[0].x + ',' + points[0].y);
 			for(var i = 1; i < points.length; i++) {
 				context.lineTo(points[i].x, points[i].y);
 			}
@@ -556,8 +564,8 @@
 			points.push(point);
 		};
 
-		self.draw = function drawPoints(context) {
-			angular.forEach(points, function drawPoints(point) {
+		self.draw = function shapeDraw(context) {
+			angular.forEach(points, function shapeDrawPoint(point) {
 				point.draw(context);
 			});
 		};

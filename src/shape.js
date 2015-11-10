@@ -50,8 +50,8 @@
 			points.push(point);
 		};
 
-		self.draw = function drawPoints(context) {
-			angular.forEach(points, function drawPoints(point) {
+		self.draw = function shapeDraw(context) {
+			angular.forEach(points, function shapeDrawPoint(point) {
 				point.draw(context);
 			});
 		};
