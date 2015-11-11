@@ -13,15 +13,24 @@
 		var ctx = null;
 		var canvas = null;
 		var mask = null;
-		var bRect = null;
 		var mouseX = 0;
 		var mouseY = 0;
 		var dirScope = null;
 		var controller;
 
-		function updateMouse(evt) {
-			mouseX = (evt.x - bRect.left) * (canvas.width / bRect.width);
-			mouseY = (evt.y - bRect.top) * (canvas.height / bRect.height);
+		function updateMouse(evt, element) {
+			var rect = element.getBoundingClientRect();
+			var scrollTop = document.documentElement.scrollTop ?
+					document.documentElement.scrollTop :
+					document.body.scrollTop;
+			var scrollLeft = document.documentElement.scrollLeft ?
+					document.documentElement.scrollLeft :
+					document.body.scrollLeft;
+			var elementLeft = rect.left+scrollLeft;
+			var elementTop = rect.top+scrollTop;
+
+			mouseX = evt.pageX-elementLeft;
+			mouseY = evt.pageY-elementTop;	
 		}
 
 		function draw() {
@@ -30,7 +39,7 @@
 		}
 
 		function mouseDownListener(evt) {
-			updateMouse(evt);
+			updateMouse(evt, canvas);
 			if(controller.startDrag(mouseX, mouseY)) {
 				canvas.addEventListener('mousemove', mouseEditMoveListener, false);
 			}
@@ -46,14 +55,14 @@
 
 		function mouseEditMoveListener(evt) {
 			if(controller.getDragging()) {
-				updateMouse(evt);
+				updateMouse(evt, canvas);
 				controller.drag(mouseX, mouseY);
 				draw();
 			}
 		}
 
 		function mouseUpListener(evt) {
-			updateMouse(evt);
+			updateMouse(evt, canvas);
 			controller.stopDrag(mouseX, mouseY);
 			canvas.removeEventListener('mousemove', mouseEditMoveListener, false);
 			dirScope.$apply();
@@ -94,7 +103,6 @@
 
 			canvas.addEventListener('mousedown', mouseDownListener, false);
 			canvas.addEventListener('mouseup', mouseUpListener, false);
-			bRect = canvas.getBoundingClientRect();
 			draw();
 		}
 
