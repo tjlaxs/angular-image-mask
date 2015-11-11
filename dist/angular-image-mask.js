@@ -139,11 +139,11 @@
 			var scrollLeft = document.documentElement.scrollLeft ?
 					document.documentElement.scrollLeft :
 					document.body.scrollLeft;
-			var elementLeft = rect.left+scrollLeft;
-			var elementTop = rect.top+scrollTop;
+			var elementLeft = rect.left + scrollLeft;
+			var elementTop = rect.top + scrollTop;
 
-			mouseX = evt.pageX-elementLeft;
-			mouseY = evt.pageY-elementTop;	
+			mouseX = evt.pageX - elementLeft;
+			mouseY = evt.pageY - elementTop;
 		}
 
 		function draw() {
@@ -269,7 +269,6 @@
 		var shapes = [];
 		var selectedShape = null;
 		var selectedPoint = null;
-		var addingMode = false;
 
 		/*
 		* Methods
@@ -309,12 +308,20 @@
 		};
 
 		self.startDrag = function(mx, my) {
+			var hit = self.onPoint(mx, my);
+			if(hit) {
+				selectedPoint = hit;
+				return true;
+			}
+			return false;
+		};
+
+		self.onPoint = function(mx, my) {
 			for(var i = 0; i < shapes.length; i++) {
 				var points = shapes[i].getPoints();
 				for(var j = 0; j < points.length; j++) {
 					if(points[j].hit(mx, my)) {
-						selectedPoint = points[j];
-						return true;
+						return points[j];
 					}
 				}
 				points = null;
@@ -323,23 +330,18 @@
 		};
 
 		self.stopDrag = function() {
-			selectedShape = null;
+			selectedPoint = null;
 		};
 
 		self.drag = function(mx, my) {
 			selectedPoint.moveTo(mx, my);
 		};
 
-		self.startAddMode = function() {
-			addingMode = true;
-		};
-		self.endAddMode = function() {
-			addingMode = false;
-			selectedShape = null;
-		};
-
 		self.addShape = function(shape) {
 			shapes.push(shape);
+			json.push(shape.getJson());
+			console.log(shape);
+			console.log(json);
 		};
 
 		self.getSelectedShape = function() {
@@ -358,9 +360,9 @@
 			selectedPoint = point;
 		};
 
-		self.addPoint = function(mx, my) {
-			selectedPoint = selectedShape.addPoint(mx, my);
-			return true;
+		self.addPoint = function(point) {
+			selectedPoint = point;
+			selectedShape.addPoint(point);
 		};
 
 		/*
@@ -486,6 +488,7 @@
 (function() {
 	'use strict';
 
+	var Point = require('./point');
 	var Polygon = require('./polygon');
 	var Control = require('./control');
 
@@ -507,23 +510,28 @@
 			var poly = new Polygon(polyConf);
 			self.getMask().addShape(poly);
 			self.getMask().setSelectedShape(poly);
+			console.log('poly init');
 		};
 
 		self.deinit = function() {
 			self.getMask().setSelectedShape(null);
+			console.log('poly deinit');
 		};
 
 		// Called when dragging starts
 		self.startDrag = function(x, y) {
-			self.getMask().addPoint(x, y);
+			var point = new Point(x, y);
+			self.getMask().addPoint(point);
+			self.getMask().setSelectedPoint(point);
+			self.getMask().startDrag();
 			self.setDragging(true);
 			return true;
 		};
 
 		// Called when dragging stops
 		self.stopDrag = function(x, y) {
-			self.getMask().stopDrag(x, y);
 			self.setDragging(false);
+			self.getMask().stopDrag(x, y);
 		};
 
 		// Called while dragging
@@ -538,7 +546,7 @@
 })();
 
 
-},{"./control":1,"./polygon":7}],7:[function(require,module,exports){
+},{"./control":1,"./point":5,"./polygon":7}],7:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -567,17 +575,19 @@
 			context.fillStyle = fillColor;
 
 			var points = self.getPoints();
-			context.beginPath();
-			context.moveTo(points[0].x, points[0].y);
-			for(var i = 1; i < points.length; i++) {
-				context.lineTo(points[i].x, points[i].y);
+			if(angular.isArray(points) && points.length > 0) {
+				context.beginPath();
+				context.moveTo(points[0].x, points[0].y);
+				for(var i = 1; i < points.length; i++) {
+					context.lineTo(points[i].x, points[i].y);
+				}
+				context.closePath();
+				context.stroke();
+				context.fill();
+				angular.forEach(points, function drawPoint(point) {
+					point.draw(context);
+				});
 			}
-			context.closePath();
-			context.stroke();
-			context.fill();
-			angular.forEach(points, function drawPoint(point) {
-				point.draw(context);
-			});
 
 			context.strokeStyle = savedColor;
 			context.fillStyle = savedFillColor;

@@ -16,7 +16,6 @@
 		var shapes = [];
 		var selectedShape = null;
 		var selectedPoint = null;
-		var addingMode = false;
 
 		/*
 		* Methods
@@ -56,12 +55,20 @@
 		};
 
 		self.startDrag = function(mx, my) {
+			var hit = self.onPoint(mx, my);
+			if(hit) {
+				selectedPoint = hit;
+				return true;
+			}
+			return false;
+		};
+
+		self.onPoint = function(mx, my) {
 			for(var i = 0; i < shapes.length; i++) {
 				var points = shapes[i].getPoints();
 				for(var j = 0; j < points.length; j++) {
 					if(points[j].hit(mx, my)) {
-						selectedPoint = points[j];
-						return true;
+						return points[j];
 					}
 				}
 				points = null;
@@ -70,23 +77,18 @@
 		};
 
 		self.stopDrag = function() {
-			selectedShape = null;
+			selectedPoint = null;
 		};
 
 		self.drag = function(mx, my) {
 			selectedPoint.moveTo(mx, my);
 		};
 
-		self.startAddMode = function() {
-			addingMode = true;
-		};
-		self.endAddMode = function() {
-			addingMode = false;
-			selectedShape = null;
-		};
-
 		self.addShape = function(shape) {
 			shapes.push(shape);
+			json.push(shape.getJson());
+			console.log(shape);
+			console.log(json);
 		};
 
 		self.getSelectedShape = function() {
@@ -105,9 +107,9 @@
 			selectedPoint = point;
 		};
 
-		self.addPoint = function(mx, my) {
-			selectedPoint = selectedShape.addPoint(mx, my);
-			return true;
+		self.addPoint = function(point) {
+			selectedPoint = point;
+			selectedShape.addPoint(point);
 		};
 
 		/*

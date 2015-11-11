@@ -26,17 +26,19 @@
 			context.fillStyle = fillColor;
 
 			var points = self.getPoints();
-			context.beginPath();
-			context.moveTo(points[0].x, points[0].y);
-			for(var i = 1; i < points.length; i++) {
-				context.lineTo(points[i].x, points[i].y);
+			if(angular.isArray(points) && points.length > 0) {
+				context.beginPath();
+				context.moveTo(points[0].x, points[0].y);
+				for(var i = 1; i < points.length; i++) {
+					context.lineTo(points[i].x, points[i].y);
+				}
+				context.closePath();
+				context.stroke();
+				context.fill();
+				angular.forEach(points, function drawPoint(point) {
+					point.draw(context);
+				});
 			}
-			context.closePath();
-			context.stroke();
-			context.fill();
-			angular.forEach(points, function drawPoint(point) {
-				point.draw(context);
-			});
 
 			context.strokeStyle = savedColor;
 			context.fillStyle = savedFillColor;

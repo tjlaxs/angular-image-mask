@@ -26,11 +26,11 @@
 			var scrollLeft = document.documentElement.scrollLeft ?
 					document.documentElement.scrollLeft :
 					document.body.scrollLeft;
-			var elementLeft = rect.left+scrollLeft;
-			var elementTop = rect.top+scrollTop;
+			var elementLeft = rect.left + scrollLeft;
+			var elementTop = rect.top + scrollTop;
 
-			mouseX = evt.pageX-elementLeft;
-			mouseY = evt.pageY-elementTop;	
+			mouseX = evt.pageX - elementLeft;
+			mouseY = evt.pageY - elementTop;
 		}
 
 		function draw() {
