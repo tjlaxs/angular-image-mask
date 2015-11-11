@@ -135,8 +135,8 @@
 		var controller;
 
 		function updateMouse(x, y) {
-			mouseX = (x - bRect.left) * (canvas.width / bRect.width);
-			mouseY = (y - bRect.top) * (canvas.height / bRect.height);
+			mouseX = (x - bRect.left + window.scrollX) * (canvas.width / bRect.width);
+			mouseY = (y - bRect.top + window.scrollY) * (canvas.height / bRect.height);
 		}
 
 		function draw() {
