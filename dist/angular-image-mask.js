@@ -639,7 +639,17 @@
 			return points;
 		};
 		self.addPoint = function(x, y) {
-			var point = new Point(x, y);
+			var point;
+			if(angular.isArray(x)) {
+			console.log('array:' + x + ' ' + y);
+				point = new Point(x);
+			} else if(angular.isObject(x)) {
+				point = x;
+			} else {
+			console.log('points:' + x + ' ' + y);
+				point = new Point(x, y);
+			}
+
 			json.data.push(point.getJson());
 			points.push(point);
 		};
