@@ -5,7 +5,7 @@
 
 	function Point(dx, dy, dr) {
 		var self = this;
-		var defaultR = 5;
+		var defaultR = 10;
 		var x = 0;
 		var y = 0;
 		var r = 0;
