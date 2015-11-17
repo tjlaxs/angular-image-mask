@@ -74,12 +74,7 @@
 		};
 
 		self.drag = function(mx, my) {
-			console.log(shapes[0].getPoints()[0].getJson());
-			var debug = 'move: ' + selectedPoint.toString();
 			selectedPoint.moveTo(mx, my);
-			debug += ' -> ' + selectedPoint.toString();
-			console.log(debug);
-			console.log(shapes[0].getPoints()[0].getJson());
 		};
 
 		self.startAddMode = function() {

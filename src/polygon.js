@@ -28,7 +28,6 @@
 			var points = self.getPoints();
 			context.beginPath();
 			context.moveTo(points[0].x, points[0].y);
-			console.log('draw polygon starting from: ' + points[0].x + ',' + points[0].y);
 			for(var i = 1; i < points.length; i++) {
 				context.lineTo(points[i].x, points[i].y);
 			}

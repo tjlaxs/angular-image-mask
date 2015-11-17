@@ -56,11 +56,8 @@
 			function mouseEditMoveListener(evt) {
 				if(controller.getDragging()) {
 					updateMouse(evt, canvas);
-					console.log('starting to drag');
 					controller.drag(mouseX, mouseY);
-					console.log('stopping drag and starting draw');
 					draw();
-					console.log('stopping draw');
 				}
 			}
 	

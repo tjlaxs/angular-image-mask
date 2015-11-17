@@ -10,7 +10,6 @@
 		* Initialization
 		*/
 
-		console.log('new control');
 		var _scope = scope;
 		var _mask = mask;
 		var _dragging = false;
@@ -75,7 +74,6 @@
 		* Initialization
 		*/
 
-		console.log('new edit control');
 		Control.call(self, scope, mask);
 
 		/*
@@ -84,9 +82,7 @@
 
 		// Called when dragging starts
 		self.startDrag = function(x, y) {
-			console.log('in editcontrol.startDrag');
 			if(self.getMask().startDrag(x, y)) {
-				console.log('start drag');
 				self.setDragging(true);
 				return true;
 			}
@@ -95,14 +91,12 @@
 
 		// Called when dragging stops
 		self.stopDrag = function(x, y) {
-			console.log('in editcontrol.stopDrag');
 			self.getMask().stopDrag(x, y);
 			self.setDragging(false);
 		};
 
 		// Called while dragging
 		self.drag = function(x, y) {
-			console.log('in editcontrol.drag');
 			self.getMask().drag(x, y);
 		};
 
@@ -172,11 +166,8 @@
 			function mouseEditMoveListener(evt) {
 				if(controller.getDragging()) {
 					updateMouse(evt, canvas);
-					console.log('starting to drag');
 					controller.drag(mouseX, mouseY);
-					console.log('stopping drag and starting draw');
 					draw();
-					console.log('stopping draw');
 				}
 			}
 	
@@ -327,12 +318,7 @@
 		};
 
 		self.drag = function(mx, my) {
-			console.log(shapes[0].getPoints()[0].getJson());
-			var debug = 'move: ' + selectedPoint.toString();
 			selectedPoint.moveTo(mx, my);
-			debug += ' -> ' + selectedPoint.toString();
-			console.log(debug);
-			console.log(shapes[0].getPoints()[0].getJson());
 		};
 
 		self.startAddMode = function() {
@@ -459,7 +445,6 @@
 			context.strokeStyle = strokeColor;
 			context.fillStyle = fillColor;
 			context.beginPath();
-			console.log(x + ',' + y);
 			context.arc(x, y, r, 0, Math.PI*2, true);
 			context.stroke();
 			context.fill();
@@ -504,7 +489,6 @@
 			var points = self.getPoints();
 			context.beginPath();
 			context.moveTo(points[0].x, points[0].y);
-			console.log('draw polygon starting from: ' + points[0].x + ',' + points[0].y);
 			for(var i = 1; i < points.length; i++) {
 				context.lineTo(points[i].x, points[i].y);
 			}

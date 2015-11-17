@@ -89,7 +89,6 @@
 			context.strokeStyle = strokeColor;
 			context.fillStyle = fillColor;
 			context.beginPath();
-			console.log(x + ',' + y);
 			context.arc(x, y, r, 0, Math.PI*2, true);
 			context.stroke();
 			context.fill();
