@@ -10,65 +10,66 @@
 	var aim = angular.module('tjlaxs.aim', []);
 
 	aim.directive('tjlImageMask', function() {
-		var ctx = null;
-		var canvas = null;
-		var mask = null;
-		var mouseX = 0;
-		var mouseY = 0;
-		var dirScope = null;
-		var controller;
-
-		function updateMouse(evt, element) {
-			var rect = element.getBoundingClientRect();
-			var scrollTop = document.documentElement.scrollTop ?
-					document.documentElement.scrollTop :
-					document.body.scrollTop;
-			var scrollLeft = document.documentElement.scrollLeft ?
-					document.documentElement.scrollLeft :
-					document.body.scrollLeft;
-			var elementLeft = rect.left + scrollLeft;
-			var elementTop = rect.top + scrollTop;
-
-			mouseX = evt.pageX - elementLeft;
-			mouseY = evt.pageY - elementTop;
-		}
-
-		function draw() {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			mask.draw(ctx);
-		}
-
-		function mouseDownListener(evt) {
-			updateMouse(evt, canvas);
-			if(controller.startDrag(mouseX, mouseY)) {
-				canvas.addEventListener('mousemove', mouseEditMoveListener, false);
-			}
-
-			// Prevent event going further
-			if (evt.preventDefault) {
-				evt.preventDefault();
-			}
-			else if (evt.returnValue) {
-				evt.returnValue = false;
-			}
-		}
-
-		function mouseEditMoveListener(evt) {
-			if(controller.getDragging()) {
-				updateMouse(evt, canvas);
-				controller.drag(mouseX, mouseY);
-				draw();
-			}
-		}
-
-		function mouseUpListener(evt) {
-			updateMouse(evt, canvas);
-			controller.stopDrag(mouseX, mouseY);
-			canvas.removeEventListener('mousemove', mouseEditMoveListener, false);
-			dirScope.$apply();
-		}
-
 		function link(scope, element/*, attrs*/) {
+			var ctx = null;
+			var canvas = null;
+			var mask = null;
+			var mouseX = 0;
+			var mouseY = 0;
+			var dirScope = null;
+			var controller;
+	
+			function updateMouse(evt, element) {
+				var rect = element.getBoundingClientRect();
+				var scrollTop = document.documentElement.scrollTop ?
+						document.documentElement.scrollTop :
+						document.body.scrollTop;
+				var scrollLeft = document.documentElement.scrollLeft ?
+						document.documentElement.scrollLeft :
+						document.body.scrollLeft;
+				var elementLeft = rect.left + scrollLeft;
+				var elementTop = rect.top + scrollTop;
+	
+				mouseX = evt.pageX - elementLeft;
+				mouseY = evt.pageY - elementTop;
+			}
+	
+			function draw() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				mask.draw(ctx);
+			}
+	
+			function mouseDownListener(evt) {
+				updateMouse(evt, canvas);
+				if(controller.startDrag(mouseX, mouseY)) {
+					canvas.addEventListener('mousemove', mouseEditMoveListener, false);
+				}
+	
+				// Prevent event going further
+				if (evt.preventDefault) {
+					evt.preventDefault();
+				}
+				else if (evt.returnValue) {
+					evt.returnValue = false;
+				}
+			}
+	
+			function mouseEditMoveListener(evt) {
+				if(controller.getDragging()) {
+					updateMouse(evt, canvas);
+					controller.drag(mouseX, mouseY);
+					draw();
+				}
+			}
+	
+			function mouseUpListener(evt) {
+				updateMouse(evt, canvas);
+				controller.stopDrag(mouseX, mouseY);
+				canvas.removeEventListener('mousemove', mouseEditMoveListener, false);
+				dirScope.$apply();
+			}
+
+			console.log(dirScope);
 			dirScope = scope;
 			canvas = element[0];
 			ctx = canvas.getContext('2d');
