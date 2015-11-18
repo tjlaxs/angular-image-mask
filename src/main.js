@@ -6,6 +6,7 @@
 	var Mask = require('./mask');
 	var EditControl = require('./editcontrol');
 	var PolyControl = require('./polycontrol');
+	var LineControl = require('./linecontrol');
 
 	var aim = angular.module('tjlaxs.aim', []);
 
@@ -92,6 +93,9 @@
 						break;
 					case 'poly':
 						controller = new PolyControl(dirScope, mask);
+						break;
+					case 'line':
+						controller = new LineControl(dirScope, mask);
 						break;
 					default:
 						return;

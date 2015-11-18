@@ -4,8 +4,8 @@
 	'use strict';
 
 	var Polygon = require('./polygon');
-	/*
 	var Line = require('./line');
+	/*
 	var Rectangle = require('./rectangle');
 	*/
 
@@ -32,10 +32,10 @@
 					case 'Polygon':
 						shapes.push(new Polygon(shape));
 						break;
-					/*
 					case 'Line':
 						shapes.push(new Line(shape));
 						break;
+					/*
 					case 'Rectangle':
 						shapes.push(new Rectangle(shape));
 						break;

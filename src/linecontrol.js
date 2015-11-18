@@ -3,10 +3,10 @@
 	'use strict';
 
 	var Point = require('./point');
-	var Polygon = require('./polygon');
+	var Line = require('./line');
 	var Control = require('./control');
 
-	function PolyControl(scope, mask) {
+	function LineControl(scope, mask) {
 		var self = this;
 
 		/*
@@ -20,16 +20,30 @@
 		*/
 
 		self.init = function() {
-			var polyConf = {name:'Polygon', type:'Polygon', data:[]};
-			var poly = new Polygon(polyConf);
-			self.getMask().addShape(poly);
-			self.getMask().setSelectedShape(poly);
-			console.log('poly init');
+			var lineConf = {name:'Line', type:'Line', data:[]};
+			var line = new Line(lineConf);
+			self.getMask().addShape(line);
+			self.getMask().setSelectedShape(line);
+			console.log('line init');
 		};
 
 		self.deinit = function() {
+			var shape = self.getMask().getSelectedShape();
+			var points = shape.getPoints();
+
+			if(points.length < 2) {
+				self.getMask().removeShape(shape);
+			}
+
+			// TODO: We should actually not even allow the creation of these points
+			if(points.length > 2) {
+				for(var i = 2; i < points.length; i++) {
+					shape.removePoint(points[i]);
+				}
+			}
+
 			self.getMask().setSelectedShape(null);
-			console.log('poly deinit');
+			console.log('line deinit');
 		};
 
 		// Called when dragging starts
@@ -56,9 +70,9 @@
 		return self;
 	}
 
-	PolyControl.prototype = Object.create(Control.prototype);
-	PolyControl.prototype.constructor = PolyControl;	
+	LineControl.prototype = Object.create(Control.prototype);
+	LineControl.prototype.constructor = LineControl;	
 
-	module.exports = PolyControl;
+	module.exports = LineControl;
 })();
 

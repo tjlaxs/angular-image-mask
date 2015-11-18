@@ -47,5 +47,8 @@
 		return self;
 	}
 
+	Polygon.prototype = Object.create(Shape.prototype);
+	Polygon.prototype.constructor = Polygon;
+
 	module.exports = Polygon;
 })();

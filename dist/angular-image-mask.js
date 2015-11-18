@@ -106,6 +106,9 @@
 		return self;
 	}
 
+	EditControl.prototype = Object.create(Control.prototype);
+	EditControl.prototype.constructor = EditControl;	
+
 	module.exports = EditControl;
 })();
 
@@ -116,9 +119,139 @@
 (function() {
 	'use strict';
 
+	var Shape = require('./shape');
+
+	function Line(conf) {
+		var self = this;
+
+		/*
+		* Initialization
+		*/
+
+		var strokeColor = '#ffffff';
+		Shape.call(self, conf);
+
+		/*
+		* Public methods
+		*/
+
+		self.draw = function(context) {
+			var savedColor = context.strokeStyle;
+			context.strokeStyle = strokeColor;
+
+			var points = self.getPoints();
+			if(angular.isArray(points) && points.length >= 2) {
+				context.beginPath();
+				context.moveTo(points[0].x, points[0].y);
+				context.lineTo(points[1].x, points[1].y);
+				context.stroke();
+				for(var i = 0; i < 2; i++) {
+					points[i].draw(context);
+				}
+			}
+
+			context.strokeStyle = savedColor;
+		};
+
+		return self;
+	}
+
+	Line.prototype = Object.create(Shape.prototype);
+	Line.prototype.constructor = Line;
+
+	module.exports = Line;
+})();
+
+},{"./shape":10}],4:[function(require,module,exports){
+/* jshint node:true */
+(function() {
+	'use strict';
+
+	var Point = require('./point');
+	var Line = require('./line');
+	var Control = require('./control');
+
+	function LineControl(scope, mask) {
+		var self = this;
+
+		/*
+		* Initialization
+		*/
+
+		Control.call(self, scope, mask);
+
+		/*
+		* Public methods
+		*/
+
+		self.init = function() {
+			var lineConf = {name:'Line', type:'Line', data:[]};
+			var line = new Line(lineConf);
+			self.getMask().addShape(line);
+			self.getMask().setSelectedShape(line);
+			console.log('line init');
+		};
+
+		self.deinit = function() {
+			var shape = self.getMask().getSelectedShape();
+			var points = shape.getPoints();
+
+			if(points.length < 2) {
+				self.getMask().removeShape(shape);
+			}
+
+			// TODO: We should actually not even allow the creation of these points
+			if(points.length > 2) {
+				for(var i = 2; i < points.length; i++) {
+					shape.removePoint(points[i]);
+				}
+			}
+
+			self.getMask().setSelectedShape(null);
+			console.log('line deinit');
+		};
+
+		// Called when dragging starts
+		self.startDrag = function(x, y) {
+			var point = new Point(x, y);
+			self.getMask().addPoint(point);
+			self.getMask().setSelectedPoint(point);
+			self.getMask().startDrag();
+			self.setDragging(true);
+			return true;
+		};
+
+		// Called when dragging stops
+		self.stopDrag = function(x, y) {
+			self.setDragging(false);
+			self.getMask().stopDrag(x, y);
+		};
+
+		// Called while dragging
+		self.drag = function(x, y) {
+			self.getMask().drag(x, y);
+		};
+
+		return self;
+	}
+
+	LineControl.prototype = Object.create(Control.prototype);
+	LineControl.prototype.constructor = LineControl;	
+
+	module.exports = LineControl;
+})();
+
+
+},{"./control":1,"./line":3,"./point":7}],5:[function(require,module,exports){
+/* jshint node:true */
+/* globals angular */
+(function() {
+	'use strict';
+
 	var Mask = require('./mask');
 	var EditControl = require('./editcontrol');
 	var PolyControl = require('./polycontrol');
+	var LineControl = require('./linecontrol');
 
 	var aim = angular.module('tjlaxs.aim', []);
 
@@ -206,6 +339,9 @@
 					case 'poly':
 						controller = new PolyControl(dirScope, mask);
 						break;
+					case 'line':
+						controller = new LineControl(dirScope, mask);
+						break;
 					default:
 						return;
 				}
@@ -251,15 +387,15 @@
 	});
 })();
 
-},{"./editcontrol":2,"./mask":4,"./polycontrol":6}],4:[function(require,module,exports){
+},{"./editcontrol":2,"./linecontrol":4,"./mask":6,"./polycontrol":8}],6:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
 	'use strict';
 
 	var Polygon = require('./polygon');
-	/*
 	var Line = require('./line');
+	/*
 	var Rectangle = require('./rectangle');
 	*/
 
@@ -286,10 +422,10 @@
 					case 'Polygon':
 						shapes.push(new Polygon(shape));
 						break;
-					/*
 					case 'Line':
 						shapes.push(new Line(shape));
 						break;
+					/*
 					case 'Rectangle':
 						shapes.push(new Rectangle(shape));
 						break;
@@ -378,7 +514,7 @@
 	module.exports = Mask;
 })();
 
-},{"./polygon":7}],5:[function(require,module,exports){
+},{"./line":3,"./polygon":9}],7:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -484,7 +620,7 @@
 	module.exports = Point;
 })();
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /* jshint node:true */
 (function() {
 	'use strict';
@@ -543,11 +679,14 @@
 		return self;
 	}
 
+	PolyControl.prototype = Object.create(Control.prototype);
+	PolyControl.prototype.constructor = PolyControl;	
+
 	module.exports = PolyControl;
 })();
 
 
-},{"./control":1,"./point":5,"./polygon":7}],7:[function(require,module,exports){
+},{"./control":1,"./point":7,"./polygon":9}],9:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -597,10 +736,13 @@
 		return self;
 	}
 
+	Polygon.prototype = Object.create(Shape.prototype);
+	Polygon.prototype.constructor = Polygon;
+
 	module.exports = Polygon;
 })();
 
-},{"./shape":8}],8:[function(require,module,exports){
+},{"./shape":10}],10:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -675,4 +817,4 @@
 	module.exports = Shape;
 })();
 
-},{"./point":5}]},{},[3]);
+},{"./point":7}]},{},[5]);

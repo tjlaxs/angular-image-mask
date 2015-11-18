@@ -25,7 +25,7 @@
 		"test": "npm run test:protractor",
 		"test:protractor": "jasmine test",
 		"build": "npm run build:jshint && npm run build:browserify && npm run build:templates",
-		"build:jshint": "jshint src/main.js src/mask.js src/shape.js src/polygon.js src/point.js src/control.js src/editcontrol.js src/polycontrol.js",
+		"build:jshint": "jshint src/main.js src/mask.js src/shape.js src/polygon.js src/point.js src/control.js src/editcontrol.js src/polycontrol.js src/line.js src/linecontrol.js",
 		"build:browserify": "browserify src/main.js > dist/angular-image-mask.js",
 		"build:templates": "cp -a templates dist/",
 		"build:examples": "npm run build && npm run build:examples-copy && npm run build:examples-libs",
