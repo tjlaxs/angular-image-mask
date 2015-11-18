@@ -3,8 +3,8 @@
 		<fieldset>
 			<legend>Mode</legend>
 			<input type="radio" ng-model="config.control.mode" value="edit"> Edit<br>
-			<!--input type="radio" ng-model="config.control.mode" value="line"> Line<br>
-			<input type="radio" ng-model="config.control.mode" value="rect"> Rectangle<br-->
+			<input type="radio" ng-model="config.control.mode" value="line"> Line<br>
+			<!--input type="radio" ng-model="config.control.mode" value="rect"> Rectangle<br-->
 			<input type="radio" ng-model="config.control.mode" value="poly"> Polygon
 
 		</fieldset>
@@ -12,7 +12,6 @@
 		<fieldset>
 			<legend>Shapes</legend>
 			<div class="shape" ng-repeat="shape in config.shapes track by $index">
-				<input type="radio" ng-model="config.control.selectedShape" value="{{shape.name}}">
 				<input type="text" value="{{shape.name}}">
 				<button>Remove</button>
 				<div class="point" ng-repeat="point in shape.data track by $index">

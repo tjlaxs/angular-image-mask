@@ -32,19 +32,6 @@
 		});
 
 		/*
-		* Initialization
-		*/
-
-		if(angular.isArray(dx)) {
-			json = dx;
-			x = dx[0] || 0;
-			y = dx[1] || 0;
-			r = dx[2] || defaultR;
-		} else {
-			self.moveTo(dx, dy, dr || defaultR);
-		}
-
-		/*
 		* Methods
 		*/
 
@@ -95,6 +82,20 @@
 			context.strokeStyle = savedColor;
 			context.fillStyle = savedFillColor;
 		};
+
+		/*
+		* Initialization
+		*/
+
+		if(angular.isArray(dx)) {
+			json = dx;
+			x = dx[0] || 0;
+			y = dx[1] || 0;
+			r = dx[2] || defaultR;
+		} else {
+			json = [];
+			self.moveTo(dx, dy, dr || defaultR);
+		}
 
 		return self;
 	}

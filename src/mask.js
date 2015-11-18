@@ -4,8 +4,8 @@
 	'use strict';
 
 	var Polygon = require('./polygon');
-	/*
 	var Line = require('./line');
+	/*
 	var Rectangle = require('./rectangle');
 	*/
 
@@ -16,7 +16,6 @@
 		var shapes = [];
 		var selectedShape = null;
 		var selectedPoint = null;
-		var addingMode = false;
 
 		/*
 		* Methods
@@ -33,10 +32,10 @@
 					case 'Polygon':
 						shapes.push(new Polygon(shape));
 						break;
-					/*
 					case 'Line':
 						shapes.push(new Line(shape));
 						break;
+					/*
 					case 'Rectangle':
 						shapes.push(new Rectangle(shape));
 						break;
@@ -56,12 +55,20 @@
 		};
 
 		self.startDrag = function(mx, my) {
+			var hit = self.onPoint(mx, my);
+			if(hit) {
+				selectedPoint = hit;
+				return true;
+			}
+			return false;
+		};
+
+		self.onPoint = function(mx, my) {
 			for(var i = 0; i < shapes.length; i++) {
 				var points = shapes[i].getPoints();
 				for(var j = 0; j < points.length; j++) {
 					if(points[j].hit(mx, my)) {
-						selectedPoint = points[j];
-						return true;
+						return points[j];
 					}
 				}
 				points = null;
@@ -70,31 +77,39 @@
 		};
 
 		self.stopDrag = function() {
-			selectedShape = null;
+			selectedPoint = null;
 		};
 
 		self.drag = function(mx, my) {
 			selectedPoint.moveTo(mx, my);
 		};
 
-		self.startAddMode = function() {
-			addingMode = true;
-		};
-		self.endAddMode = function() {
-			addingMode = false;
-			selectedShape = null;
+		self.addShape = function(shape) {
+			shapes.push(shape);
+			json.push(shape.getJson());
+			console.log(shape);
+			console.log(json);
 		};
 
-		self.addPoint = function(mx, my) {
-			if(addingMode) {
-				return;
-			}
-			if(angular.isNull(selectedShape)) {
-				var poly = new Polygon();
-				selectedShape = poly;
-				shapes.push(poly);
-			}
-			selectedShape.addPoint(mx, my);
+		self.getSelectedShape = function() {
+			return selectedShape;
+		};
+
+		self.setSelectedShape = function(shape) {
+			selectedShape = shape;
+		};
+
+		self.getSelectedPoint = function() {
+			return selectedPoint;
+		};
+
+		self.setSelectedPoint = function(point) {
+			selectedPoint = point;
+		};
+
+		self.addPoint = function(point) {
+			selectedPoint = point;
+			selectedShape.addPoint(point);
 		};
 
 		/*

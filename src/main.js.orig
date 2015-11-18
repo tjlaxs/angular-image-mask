@@ -28,16 +28,51 @@
 				var scrollLeft = document.documentElement.scrollLeft ?
 						document.documentElement.scrollLeft :
 						document.body.scrollLeft;
+<<<<<<< HEAD
+				var elementLeft = rect.left+scrollLeft;
+				var elementTop = rect.top+scrollTop;
+	
+				mouseX = evt.pageX-elementLeft;
+				mouseY = evt.pageY-elementTop;	
+=======
 				var elementLeft = rect.left + scrollLeft;
 				var elementTop = rect.top + scrollTop;
 	
 				mouseX = evt.pageX - elementLeft;
 				mouseY = evt.pageY - elementTop;
+>>>>>>> feature/control-interface
 			}
 	
 			function draw() {
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
 				mask.draw(ctx);
+<<<<<<< HEAD
+			}
+	
+			function mouseDownListener(evt) {
+				updateMouse(evt, canvas);
+				if(dirScope.config.mode === 'edit' && controller.startDrag(mouseX, mouseY)) {
+					canvas.addEventListener('mousemove', mouseEditMoveListener, false);
+				}
+	
+				// Prevent event going further
+				if (evt.preventDefault) {
+					evt.preventDefault();
+				}
+				else if (evt.returnValue) {
+					evt.returnValue = false;
+				}
+			}
+	
+			function mouseEditMoveListener(evt) {
+				if(controller.getDragging()) {
+					updateMouse(evt, canvas);
+					controller.drag(mouseX, mouseY);
+					draw();
+				}
+			}
+	
+=======
 			}
 	
 			function mouseDownListener(evt) {
@@ -63,6 +98,7 @@
 				}
 			}
 	
+>>>>>>> feature/control-interface
 			function mouseUpListener(evt) {
 				updateMouse(evt, canvas);
 				controller.stopDrag(mouseX, mouseY);
@@ -70,6 +106,10 @@
 				dirScope.$apply();
 			}
 
+<<<<<<< HEAD
+=======
+			console.log(dirScope);
+>>>>>>> feature/control-interface
 			dirScope = scope;
 			canvas = element[0];
 			ctx = canvas.getContext('2d');

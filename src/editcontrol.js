@@ -40,6 +40,9 @@
 		return self;
 	}
 
+	EditControl.prototype = Object.create(Control.prototype);
+	EditControl.prototype.constructor = EditControl;	
+
 	module.exports = EditControl;
 })();
 
