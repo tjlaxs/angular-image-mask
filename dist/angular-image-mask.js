@@ -1,83 +1,357 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /* jshint node:true */
+(function() {
+	'use strict';
+
+	function Control(scope, mask) {
+		var self = this;
+
+		/*
+		* Initialization
+		*/
+
+		var _scope = scope;
+		var _mask = mask;
+		var _dragging = false;
+		var _mouseX = null;
+		var _mouseY = null;
+	
+		/*
+		* Public methods
+		*/
+
+		self.getMask = function() {
+			return _mask;
+		};
+		self.getScope = function() {
+			return _scope;
+		};
+		self.getDragging = function() {
+			return _dragging;
+		};
+		self.setDragging = function(val) {
+			_dragging = !!val;
+		};
+
+		self.init = function() {console.log('init');};
+		self.deinit = function() {console.log('deinit');};
+
+		self.updateMouse = function(x, y) {
+			_mouseX = x;
+			_mouseY = y;
+		};
+	
+		// Called when dragging starts
+		self.startDrag = function(x, y) {
+			self.updateMouse(x, y);
+			return false;
+		};
+
+		// Called when dragging stops
+		self.stopDrag = function(x, y) {
+			self.updateMouse(x, y);
+		};
+
+		// Called while dragging
+		self.drag = function(x, y) {
+			self.updateMouse(x, y);
+		};
+
+		return self;
+	}
+
+	module.exports = Control;
+})();
+
+},{}],2:[function(require,module,exports){
+/* jshint node:true */
+(function() {
+	'use strict';
+
+	var Control = require('./control');
+
+	function EditControl(scope, mask) {
+		var self = this;
+
+		/*
+		* Initialization
+		*/
+
+		Control.call(self, scope, mask);
+
+		/*
+		* Public methods
+		*/
+
+		// Called when dragging starts
+		self.startDrag = function(x, y) {
+			if(self.getMask().startDrag(x, y)) {
+				self.setDragging(true);
+				return true;
+			}
+			return false;
+		};
+
+		// Called when dragging stops
+		self.stopDrag = function(x, y) {
+			self.getMask().stopDrag(x, y);
+			self.setDragging(false);
+		};
+
+		// Called while dragging
+		self.drag = function(x, y) {
+			self.getMask().drag(x, y);
+		};
+
+		return self;
+	}
+
+	EditControl.prototype = Object.create(Control.prototype);
+	EditControl.prototype.constructor = EditControl;	
+
+	module.exports = EditControl;
+})();
+
+
+},{"./control":1}],3:[function(require,module,exports){
+/* jshint node:true */
+/* globals angular */
+(function() {
+	'use strict';
+
+	var Shape = require('./shape');
+
+	function Line(conf) {
+		var self = this;
+
+		/*
+		* Initialization
+		*/
+
+		var strokeColor = '#ffffff';
+		Shape.call(self, conf);
+
+		/*
+		* Public methods
+		*/
+
+		self.draw = function(context) {
+			var savedColor = context.strokeStyle;
+			context.strokeStyle = strokeColor;
+
+			var points = self.getPoints();
+			if(angular.isArray(points) && points.length >= 2) {
+				context.beginPath();
+				context.moveTo(points[0].x, points[0].y);
+				context.lineTo(points[1].x, points[1].y);
+				context.stroke();
+				for(var i = 0; i < 2; i++) {
+					points[i].draw(context);
+				}
+			}
+
+			context.strokeStyle = savedColor;
+		};
+
+		return self;
+	}
+
+	Line.prototype = Object.create(Shape.prototype);
+	Line.prototype.constructor = Line;
+
+	module.exports = Line;
+})();
+
+},{"./shape":10}],4:[function(require,module,exports){
+/* jshint node:true */
+(function() {
+	'use strict';
+
+	var Point = require('./point');
+	var Line = require('./line');
+	var Control = require('./control');
+
+	function LineControl(scope, mask) {
+		var self = this;
+
+		/*
+		* Initialization
+		*/
+
+		Control.call(self, scope, mask);
+
+		/*
+		* Public methods
+		*/
+
+		self.init = function() {
+			var lineConf = {name:'Line', type:'Line', data:[]};
+			var line = new Line(lineConf);
+			self.getMask().addShape(line);
+			self.getMask().setSelectedShape(line);
+			console.log('line init');
+		};
+
+		self.deinit = function() {
+			var shape = self.getMask().getSelectedShape();
+			var points = shape.getPoints();
+
+			if(points.length < 2) {
+				self.getMask().removeShape(shape);
+			}
+
+			// TODO: We should actually not even allow the creation of these points
+			if(points.length > 2) {
+				for(var i = 2; i < points.length; i++) {
+					shape.removePoint(points[i]);
+				}
+			}
+
+			self.getMask().setSelectedShape(null);
+			console.log('line deinit');
+		};
+
+		// Called when dragging starts
+		self.startDrag = function(x, y) {
+			var point = new Point(x, y);
+			self.getMask().addPoint(point);
+			self.getMask().setSelectedPoint(point);
+			self.getMask().startDrag();
+			self.setDragging(true);
+			return true;
+		};
+
+		// Called when dragging stops
+		self.stopDrag = function(x, y) {
+			self.setDragging(false);
+			self.getMask().stopDrag(x, y);
+		};
+
+		// Called while dragging
+		self.drag = function(x, y) {
+			self.getMask().drag(x, y);
+		};
+
+		return self;
+	}
+
+	LineControl.prototype = Object.create(Control.prototype);
+	LineControl.prototype.constructor = LineControl;	
+
+	module.exports = LineControl;
+})();
+
+
+},{"./control":1,"./line":3,"./point":7}],5:[function(require,module,exports){
+/* jshint node:true */
 /* globals angular */
 (function() {
 	'use strict';
 
 	var Mask = require('./mask');
+	var EditControl = require('./editcontrol');
+	var PolyControl = require('./polycontrol');
+	var LineControl = require('./linecontrol');
 
 	var aim = angular.module('tjlaxs.aim', []);
 
-	aim.controller('imageMaskController', function() {
-	});
-
 	aim.directive('tjlImageMask', function() {
-		var ctx = null;
-		var canvas = null;
-		var mask = null;
-		var bRect = null;
-		var mouseX = 0;
-		var mouseY = 0;
-		var rootScope = null;
+		function link(scope, element/*, attrs*/) {
+			var ctx = null;
+			var canvas = null;
+			var mask = null;
+			var mouseX = 0;
+			var mouseY = 0;
+			var dirScope = null;
+			var controller;
+	
+			function updateMouse(evt, element) {
+				var rect = element.getBoundingClientRect();
+				var scrollTop = document.documentElement.scrollTop ?
+						document.documentElement.scrollTop :
+						document.body.scrollTop;
+				var scrollLeft = document.documentElement.scrollLeft ?
+						document.documentElement.scrollLeft :
+						document.body.scrollLeft;
+				var elementLeft = rect.left + scrollLeft;
+				var elementTop = rect.top + scrollTop;
+	
+				mouseX = evt.pageX - elementLeft;
+				mouseY = evt.pageY - elementTop;
+			}
+	
+			function draw() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				mask.draw(ctx);
+			}
+	
+			function mouseDownListener(evt) {
+				updateMouse(evt, canvas);
+				if(controller.startDrag(mouseX, mouseY)) {
+					canvas.addEventListener('mousemove', mouseEditMoveListener, false);
+				}
+	
+				// Prevent event going further
+				if (evt.preventDefault) {
+					evt.preventDefault();
+				}
+				else if (evt.returnValue) {
+					evt.returnValue = false;
+				}
+			}
+	
+			function mouseEditMoveListener(evt) {
+				if(controller.getDragging()) {
+					updateMouse(evt, canvas);
+					controller.drag(mouseX, mouseY);
+					draw();
+				}
+			}
+	
+			function mouseUpListener(evt) {
+				updateMouse(evt, canvas);
+				controller.stopDrag(mouseX, mouseY);
+				canvas.removeEventListener('mousemove', mouseEditMoveListener, false);
+				dirScope.$apply();
+			}
 
-		function init(element, scope) {
-			rootScope = scope;
+			dirScope = scope;
 			canvas = element[0];
 			ctx = canvas.getContext('2d');
 			ctx.strokeStyle = 'rgb(200, 20, 10)';
-			mask = new Mask(scope.paths);
+
+			mask = new Mask(scope.config.shapes);
+			scope.$watch('config.shapes', function(newValue) {
+				if(!angular.isUndefined(newValue)) {
+					mask.setConfig(scope.config.shapes);
+					draw();
+				}
+			}, true);
+
+			controller = new EditControl(dirScope, mask);
+			scope.$watch('config.control.mode', function(newValue) {
+				var old = controller;
+				switch(newValue) {
+					case 'edit':
+						controller = new EditControl(dirScope, mask);
+						break;
+					case 'poly':
+						controller = new PolyControl(dirScope, mask);
+						break;
+					case 'line':
+						controller = new LineControl(dirScope, mask);
+						break;
+					default:
+						return;
+				}
+				console.log(old);
+				old.deinit();
+				console.log(controller);
+				controller.init();
+			});
+
 			canvas.addEventListener('mousedown', mouseDownListener, false);
 			canvas.addEventListener('mouseup', mouseUpListener, false);
-			bRect = canvas.getBoundingClientRect();
-		}
-
-		function updateMouse(x, y) {
-			mouseX = (x - bRect.left) * (canvas.width / bRect.width);
-			mouseY = (y - bRect.top) * (canvas.height / bRect.height);
-		}
-
-		function draw() {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			mask.draw(ctx);
-		}
-
-		function mouseDownListener(evt) {
-			updateMouse(evt.x, evt.y);
-			if(mask.startDrag(mouseX, mouseY)) {
-				canvas.addEventListener('mousemove', mouseMoveListener, false);
-			}
-
-			// Prevent event going further
-			if (evt.preventDefault) {
-				evt.preventDefault();
-			}
-			else if (evt.returnValue) {
-				evt.returnValue = false;
-			}
-		}
-
-		function mouseMoveListener(evt) {
-			if(mask.dragging) {
-				updateMouse(evt.x, evt.y);
-				mask.moveDrag(mouseX, mouseY);
-				draw();
-			}
-		}
-
-		function mouseUpListener(evt) {
-			updateMouse(evt.x, evt.y);
-			mask.stopDrag();
-			canvas.removeEventListener('mousemove', mouseMoveListener, false);
-			console.log('UP');
-			console.log(rootScope.paths);
-			rootScope.$digest();
-		}
-
-		function link(scope, element/*, attrs*/) {
-			init(element, scope);
-			scope.$watch('paths', function() {
-				console.log(scope.paths);
-			});
 			draw();
 		}
 
@@ -85,24 +359,42 @@
 			restrict: 'A',
 			link: link,
 			scope: {
-				paths: '='
+				config: '='
 			}
 		};
 
 		return ret;
 	});
 
+	aim.directive('tjlImageMaskControl', function() {
+		function link(scope) {
+			if(angular.isUndefined(scope.config.control.mode)) {
+				scope.config.mode = 'edit';
+			}
+		}
+
+		var ret = {
+			restrict: 'E',
+			link: link,
+			templateUrl: 'templates/image-mask.part.html',
+			scope: {
+				config: '='
+			}
+		};
+
+		return ret;
+	});
 })();
 
-},{"./mask":2}],2:[function(require,module,exports){
+},{"./editcontrol":2,"./linecontrol":4,"./mask":6,"./polycontrol":8}],6:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
 	'use strict';
 
 	var Polygon = require('./polygon');
-	/*
 	var Line = require('./line');
+	/*
 	var Rectangle = require('./rectangle');
 	*/
 
@@ -111,31 +403,8 @@
 
 		var json = shapeList;
 		var shapes = [];
-		var dragging = false;
-		var selectedObject = null;
-
-		/*
-		* Initialization
-		*/
-
-		angular.forEach(shapeList, function(shape) {
-			switch(shape.type) {
-				case 'Polygon':
-					shapes.push(new Polygon(shape));
-					break;
-				/*
-				case 'Line':
-					shapes.push(new Line(shape));
-					break;
-				case 'Rectangle':
-					shapes.push(new Rectangle(shape));
-					break;
-				*/
-				default:
-					console.warn('Unknown shape: ' + shape.type);
-					break;
-			}
-		});
+		var selectedShape = null;
+		var selectedPoint = null;
 
 		/*
 		* Methods
@@ -145,29 +414,50 @@
 			return json;
 		};
 
-		self.getDragging = function() {
-			return dragging;
-		};
-		self.setDragging = function(val) {
-			dragging = val ? true : false;
+		self.setConfig = function setConfig(config) {
+			shapes = [];
+			angular.forEach(config, function initializeShapes(shape) {
+				switch(shape.type) {
+					case 'Polygon':
+						shapes.push(new Polygon(shape));
+						break;
+					case 'Line':
+						shapes.push(new Line(shape));
+						break;
+					/*
+					case 'Rectangle':
+						shapes.push(new Rectangle(shape));
+						break;
+					*/
+					default:
+						console.warn('Unknown shape: ' + shape.type);
+						break;
+				}
+			});
+
 		};
 
 		self.draw = function(context) {
-			console.log(self);
-			angular.forEach(shapes, function(shape) {
+			angular.forEach(shapes, function drawShapes(shape) {
 				shape.draw(context);
 			});
 		};
 
 		self.startDrag = function(mx, my) {
+			var hit = self.onPoint(mx, my);
+			if(hit) {
+				selectedPoint = hit;
+				return true;
+			}
+			return false;
+		};
+
+		self.onPoint = function(mx, my) {
 			for(var i = 0; i < shapes.length; i++) {
 				var points = shapes[i].getPoints();
 				for(var j = 0; j < points.length; j++) {
 					if(points[j].hit(mx, my)) {
-						console.log('point was clicked');
-						self.dragging = true;
-						selectedObject = points[j];
-						return true;
+						return points[j];
 					}
 				}
 				points = null;
@@ -176,13 +466,46 @@
 		};
 
 		self.stopDrag = function() {
-			self.dragging = false;
-			selectedObject = null;
+			selectedPoint = null;
 		};
 
-		self.moveDrag = function(mx, my) {
-			selectedObject.moveTo(mx, my);
+		self.drag = function(mx, my) {
+			selectedPoint.moveTo(mx, my);
 		};
+
+		self.addShape = function(shape) {
+			shapes.push(shape);
+			json.push(shape.getJson());
+			console.log(shape);
+			console.log(json);
+		};
+
+		self.getSelectedShape = function() {
+			return selectedShape;
+		};
+
+		self.setSelectedShape = function(shape) {
+			selectedShape = shape;
+		};
+
+		self.getSelectedPoint = function() {
+			return selectedPoint;
+		};
+
+		self.setSelectedPoint = function(point) {
+			selectedPoint = point;
+		};
+
+		self.addPoint = function(point) {
+			selectedPoint = point;
+			selectedShape.addPoint(point);
+		};
+
+		/*
+		* Initialization
+		*/
+
+		self.setConfig(shapeList);
 
 		return self;
 	}
@@ -190,7 +513,7 @@
 	module.exports = Mask;
 })();
 
-},{"./polygon":4}],3:[function(require,module,exports){
+},{"./line":3,"./polygon":9}],7:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -198,49 +521,53 @@
 
 	function Point(dx, dy, dr) {
 		var self = this;
-		var defaultR = 5;
+		var defaultR = 10;
 		var x = 0;
 		var y = 0;
 		var r = 0;
+		var strokeColor = '#000000';
+		var fillColor = 'rgba(255, 255, 255, 0.3)';
 		var json = null;
 
 		Object.defineProperties(self, {
 			'x': {
 				get: function() {
-					     return x;
-				     }
+					return x;
+				}
 			},
 			'y': {
 				get: function() {
-					     return y;
-				     }
+					return y;
+				}
 			},
 			'r': {
 				get: function() {
-					     return r;
-				     }
+					return r;
+				}
 			}
 		});
 
 		/*
-		 * Initialization
-		 */
+		* Methods
+		*/
 
-		if(angular.isArray(dx)) {
-			json = dx;
-			x = dx[0] || 0;
-			y = dx[1] || 0;
-			r = dx[2] || defaultR;
-		} else {
-			self.moveTo(dx, dy, dr || defaultR);
-		}
+		self.toString = function() {
+			return '(' + x + ', ' + y + ')';
+		};
 
-		/*
-		 * Methods
-		 */
+		self.setColor = function(color, fillColor) {
+			strokeColor = color;
+			self.setFillColor(fillColor);
+		};
+		self.setFillColor = function(color) {
+			fillColor = color;
+		};
+
+		self.getJson = function() {
+			return json;
+		};
 
 		self.distance = function(px, py) {
-			console.log(self);
 			var dx = px - x;
 			var dy = py - y;
 			return Math.sqrt(dx*dx + dy*dy);
@@ -248,14 +575,11 @@
 
 		self.hit = function(mx, my) {
 			return self.distance(mx, my) < r;
-
 		};
 
 		self.moveTo = function(mx, my, mr) {
-			console.log('MOVE');
-			console.log(self);
-			x = json[0] = mx;
-			y = json[1] = my;
+			x = json[0] = Math.round(mx);
+			y = json[1] = Math.round(my);
 			if(json.length > 2) {
 				r = json[2] = mr || r;
 			}
@@ -263,11 +587,31 @@
 		};
 
 		self.draw = function(context) {
-			console.log(self);
+			var savedColor = context.strokeStyle;
+			var savedFillColor = context.fillStyle;
+			context.strokeStyle = strokeColor;
+			context.fillStyle = fillColor;
 			context.beginPath();
 			context.arc(x, y, r, 0, Math.PI*2, true);
 			context.stroke();
+			context.fill();
+			context.strokeStyle = savedColor;
+			context.fillStyle = savedFillColor;
 		};
+
+		/*
+		* Initialization
+		*/
+
+		if(angular.isArray(dx)) {
+			json = dx;
+			x = dx[0] || 0;
+			y = dx[1] || 0;
+			r = dx[2] || defaultR;
+		} else {
+			json = [];
+			self.moveTo(dx, dy, dr || defaultR);
+		}
 
 		return self;
 	}
@@ -275,7 +619,73 @@
 	module.exports = Point;
 })();
 
-},{}],4:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
+/* jshint node:true */
+(function() {
+	'use strict';
+
+	var Point = require('./point');
+	var Polygon = require('./polygon');
+	var Control = require('./control');
+
+	function PolyControl(scope, mask) {
+		var self = this;
+
+		/*
+		* Initialization
+		*/
+
+		Control.call(self, scope, mask);
+
+		/*
+		* Public methods
+		*/
+
+		self.init = function() {
+			var polyConf = {name:'Polygon', type:'Polygon', data:[]};
+			var poly = new Polygon(polyConf);
+			self.getMask().addShape(poly);
+			self.getMask().setSelectedShape(poly);
+			console.log('poly init');
+		};
+
+		self.deinit = function() {
+			self.getMask().setSelectedShape(null);
+			console.log('poly deinit');
+		};
+
+		// Called when dragging starts
+		self.startDrag = function(x, y) {
+			var point = new Point(x, y);
+			self.getMask().addPoint(point);
+			self.getMask().setSelectedPoint(point);
+			self.getMask().startDrag();
+			self.setDragging(true);
+			return true;
+		};
+
+		// Called when dragging stops
+		self.stopDrag = function(x, y) {
+			self.setDragging(false);
+			self.getMask().stopDrag(x, y);
+		};
+
+		// Called while dragging
+		self.drag = function(x, y) {
+			self.getMask().drag(x, y);
+		};
+
+		return self;
+	}
+
+	PolyControl.prototype = Object.create(Control.prototype);
+	PolyControl.prototype.constructor = PolyControl;	
+
+	module.exports = PolyControl;
+})();
+
+
+},{"./control":1,"./point":7,"./polygon":9}],9:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -289,6 +699,8 @@
 		*/
 
 		var self = this;
+		var strokeColor = '#ffffff';
+		var fillColor = 'rgba(0, 0, 0, 0.3)';
 		Shape.call(self, conf);
 
 		/*
@@ -296,28 +708,40 @@
 		*/
 
 		self.draw = function(context) {
+			var savedColor = context.strokeStyle;
+			var savedFillColor = context.fillStyle;
+			context.strokeStyle = strokeColor;
+			context.fillStyle = fillColor;
+
 			var points = self.getPoints();
-			context.beginPath();
-			context.moveTo(points[0].x, points[0].y);
-			for(var i = 1; i < points.length; i++) {
-				context.lineTo(points[i].x, points[i].y);
+			if(angular.isArray(points) && points.length > 0) {
+				context.beginPath();
+				context.moveTo(points[0].x, points[0].y);
+				for(var i = 1; i < points.length; i++) {
+					context.lineTo(points[i].x, points[i].y);
+				}
+				context.closePath();
+				context.stroke();
+				context.fill();
+				angular.forEach(points, function drawPoint(point) {
+					point.draw(context);
+				});
 			}
-			context.closePath();
-			context.stroke();
-			context.fillStyle = 'hsla(120,100%,75%, 0.3';
-			context.fill();
-			angular.forEach(points, function drawPoint(point) {
-				point.draw(context);
-			});
+
+			context.strokeStyle = savedColor;
+			context.fillStyle = savedFillColor;
 		};
 
 		return self;
 	}
 
+	Polygon.prototype = Object.create(Shape.prototype);
+	Polygon.prototype.constructor = Polygon;
+
 	module.exports = Polygon;
 })();
 
-},{"./shape":5}],5:[function(require,module,exports){
+},{"./shape":10}],10:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -328,19 +752,12 @@
 	function Shape(conf) {
 		var self = this;
 
-		/*
-		* Initialization
-		*/
-		
-		var json = conf;
-		var name = conf.name;
-		var type = conf.type;
+		// Default to supplied shape or empty polygon
+		var json = conf || {name: 'Shape', type: 'Polygon', data: []};
+		var name = json.name;
+		var type = json.type;
 		var points = [];
 
-		angular.forEach(conf.data, function(value) {
-			points.push(new Point(value));
-		});
-	
 		/*
 		* Public methods
 		*/
@@ -363,12 +780,35 @@
 		self.getPoints = function() {
 			return points;
 		};
+		self.addPoint = function(x, y) {
+			var point;
+			if(angular.isArray(x)) {
+			console.log('array:' + x + ' ' + y);
+				point = new Point(x);
+			} else if(angular.isObject(x)) {
+				point = x;
+			} else {
+			console.log('points:' + x + ' ' + y);
+				point = new Point(x, y);
+			}
 
-		self.draw = function drawPoints(context) {
-			angular.forEach(points, function drawPoints(point) {
+			json.data.push(point.getJson());
+			points.push(point);
+		};
+
+		self.draw = function shapeDraw(context) {
+			angular.forEach(points, function shapeDrawPoint(point) {
 				point.draw(context);
 			});
 		};
+	
+		/*
+		* Initialization
+		*/
+
+		angular.forEach(json.data, function initializePoints(value) {
+			points.push(new Point(value));
+		});
 	
 		return self;
 	}
@@ -376,4 +816,4 @@
 	module.exports = Shape;
 })();
 
-},{"./point":3}]},{},[1]);
+},{"./point":7}]},{},[5]);

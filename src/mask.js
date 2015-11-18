@@ -4,8 +4,8 @@
 	'use strict';
 
 	var Polygon = require('./polygon');
-	/*
 	var Line = require('./line');
+	/*
 	var Rectangle = require('./rectangle');
 	*/
 
@@ -14,31 +14,8 @@
 
 		var json = shapeList;
 		var shapes = [];
-		var dragging = false;
-		var selectedObject = null;
-
-		/*
-		* Initialization
-		*/
-
-		angular.forEach(shapeList, function(shape) {
-			switch(shape.type) {
-				case 'Polygon':
-					shapes.push(new Polygon(shape));
-					break;
-				/*
-				case 'Line':
-					shapes.push(new Line(shape));
-					break;
-				case 'Rectangle':
-					shapes.push(new Rectangle(shape));
-					break;
-				*/
-				default:
-					console.warn('Unknown shape: ' + shape.type);
-					break;
-			}
-		});
+		var selectedShape = null;
+		var selectedPoint = null;
 
 		/*
 		* Methods
@@ -48,29 +25,50 @@
 			return json;
 		};
 
-		self.getDragging = function() {
-			return dragging;
-		};
-		self.setDragging = function(val) {
-			dragging = val ? true : false;
+		self.setConfig = function setConfig(config) {
+			shapes = [];
+			angular.forEach(config, function initializeShapes(shape) {
+				switch(shape.type) {
+					case 'Polygon':
+						shapes.push(new Polygon(shape));
+						break;
+					case 'Line':
+						shapes.push(new Line(shape));
+						break;
+					/*
+					case 'Rectangle':
+						shapes.push(new Rectangle(shape));
+						break;
+					*/
+					default:
+						console.warn('Unknown shape: ' + shape.type);
+						break;
+				}
+			});
+
 		};
 
 		self.draw = function(context) {
-			console.log(self);
-			angular.forEach(shapes, function(shape) {
+			angular.forEach(shapes, function drawShapes(shape) {
 				shape.draw(context);
 			});
 		};
 
 		self.startDrag = function(mx, my) {
+			var hit = self.onPoint(mx, my);
+			if(hit) {
+				selectedPoint = hit;
+				return true;
+			}
+			return false;
+		};
+
+		self.onPoint = function(mx, my) {
 			for(var i = 0; i < shapes.length; i++) {
 				var points = shapes[i].getPoints();
 				for(var j = 0; j < points.length; j++) {
 					if(points[j].hit(mx, my)) {
-						console.log('point was clicked');
-						self.dragging = true;
-						selectedObject = points[j];
-						return true;
+						return points[j];
 					}
 				}
 				points = null;
@@ -79,13 +77,46 @@
 		};
 
 		self.stopDrag = function() {
-			self.dragging = false;
-			selectedObject = null;
+			selectedPoint = null;
 		};
 
-		self.moveDrag = function(mx, my) {
-			selectedObject.moveTo(mx, my);
+		self.drag = function(mx, my) {
+			selectedPoint.moveTo(mx, my);
 		};
+
+		self.addShape = function(shape) {
+			shapes.push(shape);
+			json.push(shape.getJson());
+			console.log(shape);
+			console.log(json);
+		};
+
+		self.getSelectedShape = function() {
+			return selectedShape;
+		};
+
+		self.setSelectedShape = function(shape) {
+			selectedShape = shape;
+		};
+
+		self.getSelectedPoint = function() {
+			return selectedPoint;
+		};
+
+		self.setSelectedPoint = function(point) {
+			selectedPoint = point;
+		};
+
+		self.addPoint = function(point) {
+			selectedPoint = point;
+			selectedShape.addPoint(point);
+		};
+
+		/*
+		* Initialization
+		*/
+
+		self.setConfig(shapeList);
 
 		return self;
 	}

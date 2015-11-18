@@ -4,16 +4,20 @@ Directive to draw lines and paths and masks over an image.
 
 
 ##Progress
+
 Currently in version 0.0.0 with sort of proof of concept.
 
+
 ### Based on the *paths* object
+
 * [x] Draw lines on the canvas
-* [ ] Draw polygons on the canvas
+* [x] Draw polygons on the canvas
 * [ ] Draw rectangles on the canvas
+
 
 ### User interaction
 * [x] Dragging of points
-* [ ] Basic control interface through the *config* attribute
+* [x] Basic control interface through the *config* attribute (this is very ugly)
 
 
 ## Build
@@ -23,20 +27,30 @@ To build the dist files do:
 $ npm run build
 ```
 
+To build the dist files and examples do:
+```
+$ npm run build:examples
+```
+
 
 ## Install
 
 Copy dist/* to a desired place. Add a dependency on 'tjlaxs.aim'
-module and use <canvas tjl-image-mask> where ever needed.
+and use <canvas tjl-image-mask config="something"> where ever needed.
+
+Optionally you can also add <tjl-image-mask-control config="something"/> to
+add an ugly edit interface.
 
 
 ## Usage
 
-The directive has two attributes that it uses which are
- * *paths* to provide a model binding and
- * *config* to provide basic configuration. (Not implemented!)
- 
-Paths will hold an Javascript Array of Objects. Something like:
+<tjl-image-mask> has basically two attributes inside *config*
+attribute: *config.control* and *config.shapes*. Look at
+examples in the examples directory.
+
+Control will hold variables to configure and control the drawer
+ and shapes will hold an Javascript Array of Objects. Something
+like:
 ```
 [
   {
@@ -48,6 +62,19 @@ Paths will hold an Javascript Array of Objects. Something like:
     name: 'Wall',
     type: 'Line',
     data: [[150, 30], [160, 610]]
+  },
+  {
+    name: 'Area',
+    type: 'Polygon',
+    data: [[150, 30], [160, 610], [350, 230], [460, 310]]
   }
 ]
 ```
+
+## Ugly control interfrace usage
+
+1. To create a shape: Select a shape from the Mode list.
+2. Add points by clicking around.
+3. End creation of points by selecting another shape or edit mode from mode list.
+
+
