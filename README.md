@@ -1,5 +1,24 @@
 # angular-image-mask
+
 Directive to draw lines and paths and masks over an image.
+
+
+##Progress
+
+Currently in version 0.0.0 with sort of proof of concept.
+
+
+### Based on the *paths* object
+
+* [x] Draw lines on the canvas
+* [x] Draw polygons on the canvas
+* [ ] Draw rectangles on the canvas
+
+
+### User interaction
+* [x] Dragging of points
+* [x] Basic control interface through the *config* attribute (this is very ugly)
+
 
 ## Build
 
@@ -8,12 +27,19 @@ To build the dist files do:
 $ npm run build
 ```
 
+To build the dist files and examples do:
+```
+$ npm run build:examples
+```
+
+
 ## Install
 
 Copy dist/* to a desired place. Add a dependency on 'tjlaxs.aim'
 and use <canvas tjl-image-mask config="something"> where ever needed.
 
 Optionally you can also add <tjl-image-mask-control config="something"/> to 
+
 
 ## Usage
 
@@ -43,3 +69,11 @@ like:
   }
 ]
 ```
+
+## Ugly control interfrace usage
+
+1. To create a shape: Select a shape from the Mode list.
+2. Add points by clicking around.
+3. End creation of points by selecting another shape or edit mode from mode list.
+
+
