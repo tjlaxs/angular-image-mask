@@ -35,13 +35,6 @@
 				self.getMask().removeShape(shape);
 			}
 
-			// TODO: We should actually not even allow the creation of these points
-			if(points.length > 2) {
-				for(var i = 2; i < points.length; i++) {
-					shape.removePoint(points[i]);
-				}
-			}
-
 			self.getMask().setSelectedShape(null);
 			console.log('rect deinit');
 		};

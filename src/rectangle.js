@@ -15,6 +15,8 @@
 		var fillColor = 'rgba(0, 0, 0, 0.3)';
 		Shape.call(self, conf);
 
+		self.setMaxPoints(2);
+
 		/*
 		* Public methods
 		*/
