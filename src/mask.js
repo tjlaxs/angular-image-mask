@@ -119,13 +119,16 @@
 
 		self.removeShape = function(shape) {
 			var index = null;
+			var jsonIndex = null;
 			if(angular.isObject(shape)) {
 				if(shape instanceof Shape) {
 					index = shapes.indexOf(shape);
+					jsonIndex = json.indexOf(shape.getJson());
 				} else {
 					for(var i = 0; i < shapes.length; i++) {
 						if(shapes[i].getJson() === shape) {
 							index = i;
+							jsonIndex = shape;
 							break;
 						}
 					}
@@ -137,7 +140,7 @@
 				throw new UnidentifiedShape();
 			}
 
-			json.splice(index, 1);
+			json.splice(jsonIndex, 1);
 			shapes.splice(index, 1);
 		};
 
