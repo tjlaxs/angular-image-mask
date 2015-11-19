@@ -2,7 +2,7 @@
 	"author": "Tero Laxström <tero.laxstrom@visit.fi>",
 	"name": "angular-image-mask",
 	"description": "angular-image-mask - An AngularJS directive to draw paths and masks over an image",
-	"version": "0.0.0",
+	"version": "0.0.2",
 	"homepage": "https://github.com/tjlaxs/angular-image-mask",
 	"repository": {
 		"type": "git",

@@ -5,7 +5,7 @@ Directive to draw lines and paths and masks over an image.
 
 ##Progress
 
-Currently in version 0.0.1 with sort of proof of concept.
+Currently in version 0.0.2 with sort of proof of concept.
 
 
 ### Based on the *paths* object
@@ -38,7 +38,8 @@ $ npm run build:examples
 Copy dist/* to a desired place. Add a dependency on 'tjlaxs.aim'
 and use <canvas tjl-image-mask config="something"> where ever needed.
 
-Optionally you can also add <tjl-image-mask-control config="something"/> to 
+Optionally you can also add <tjl-image-mask-control config="something"/> to
+add an ugly edit interface.
 
 
 ## Usage
