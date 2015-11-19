@@ -15,6 +15,8 @@
 		var strokeColor = '#ffffff';
 		Shape.call(self, conf);
 
+		self.setMaxPoints(2);
+
 		/*
 		* Public methods
 		*/
