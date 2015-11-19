@@ -6,6 +6,7 @@
 	var Polygon = require('./polygon');
 	var Line = require('./line');
 	var Rectangle = require('./rectangle');
+	var Shape = require('./shape');
 
 	function Mask(shapeList) {
 		var self = this;
@@ -16,14 +17,37 @@
 		var selectedPoint = null;
 
 		/*
+		* Exceptions
+		*/
+
+		function NoSuchShape() {
+			this.name = 'NoSuchShape';
+			this.message = 'This shape could not be found in the shape list.';
+		}
+
+		function UnidentifiedShape() {
+			this.name = 'UnidentifiedShape';
+			this.message = 'Could not confirm the passed parameter as a shape.';
+		}
+
+		/*
 		* Methods
 		*/
 
-		self.getJson = function getJson() {
+		self.getJson = function() {
 			return json;
 		};
 
-		self.setConfig = function setConfig(config) {
+		self.getShapes = function() {
+			return shapes;
+		};
+
+		self.setConfig = function(config) {
+			var selectedShapeJson = null;
+			if(selectedShape !== null) {
+				selectedShapeJson = selectedShape.getJson();
+			}
+			selectedShape = null;
 			shapes = [];
 			angular.forEach(config, function initializeShapes(shape) {
 				switch(shape.type) {
@@ -41,7 +65,13 @@
 						break;
 				}
 			});
-
+			for(var i = 0; i < shapes.length; i++) {
+				if(shapes[i].getJson() === selectedShapeJson) {
+					console.log('found the right shape');
+					selectedShape = shapes[i];
+					break;
+				}
+			}
 		};
 
 		self.draw = function(context) {
@@ -85,6 +115,30 @@
 			json.push(shape.getJson());
 			console.log(shape);
 			console.log(json);
+		};
+
+		self.removeShape = function(shape) {
+			var index = null;
+			if(angular.isObject(shape)) {
+				if(shape instanceof Shape) {
+					index = shapes.indexOf(shape);
+				} else {
+					for(var i = 0; i < shapes.length; i++) {
+						if(shapes[i].getJson() === shape) {
+							index = i;
+							break;
+						}
+					}
+				}
+				if(index === -1) {
+					throw new NoSuchShape();
+				}
+			} else {
+				throw new UnidentifiedShape();
+			}
+
+			json.splice(index, 1);
+			shapes.splice(index, 1);
 		};
 
 		self.getSelectedShape = function() {
