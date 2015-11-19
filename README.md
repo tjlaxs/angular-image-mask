@@ -5,7 +5,7 @@ Directive to draw lines and paths and masks over an image.
 
 ##Progress
 
-Currently in version 0.0.1 with sort of proof of concept.
+Currently in version 0.0.2 with sort of proof of concept.
 
 
 ### Based on the *paths* object
