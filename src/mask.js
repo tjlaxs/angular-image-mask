@@ -128,7 +128,7 @@
 					for(var i = 0; i < shapes.length; i++) {
 						if(shapes[i].getJson() === shape) {
 							index = i;
-							jsonIndex = shape;
+							jsonIndex = json.indexOf(shape);
 							break;
 						}
 					}
