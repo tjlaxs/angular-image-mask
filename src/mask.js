@@ -5,9 +5,7 @@
 
 	var Polygon = require('./polygon');
 	var Line = require('./line');
-	/*
 	var Rectangle = require('./rectangle');
-	*/
 
 	function Mask(shapeList) {
 		var self = this;
@@ -35,11 +33,9 @@
 					case 'Line':
 						shapes.push(new Line(shape));
 						break;
-					/*
 					case 'Rectangle':
 						shapes.push(new Rectangle(shape));
 						break;
-					*/
 					default:
 						console.warn('Unknown shape: ' + shape.type);
 						break;

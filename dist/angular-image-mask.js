@@ -162,7 +162,7 @@
 	module.exports = Line;
 })();
 
-},{"./shape":10}],4:[function(require,module,exports){
+},{"./shape":12}],4:[function(require,module,exports){
 /* jshint node:true */
 (function() {
 	'use strict';
@@ -252,6 +252,7 @@
 	var EditControl = require('./editcontrol');
 	var PolyControl = require('./polycontrol');
 	var LineControl = require('./linecontrol');
+	var RectControl = require('./rectcontrol');
 
 	var aim = angular.module('tjlaxs.aim', []);
 
@@ -341,6 +342,9 @@
 					case 'line':
 						controller = new LineControl(dirScope, mask);
 						break;
+					case 'rect':
+						controller = new RectControl(dirScope, mask);
+						break;
 					default:
 						return;
 				}
@@ -386,7 +390,7 @@
 	});
 })();
 
-},{"./editcontrol":2,"./linecontrol":4,"./mask":6,"./polycontrol":8}],6:[function(require,module,exports){
+},{"./editcontrol":2,"./linecontrol":4,"./mask":6,"./polycontrol":8,"./rectcontrol":11}],6:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -394,9 +398,7 @@
 
 	var Polygon = require('./polygon');
 	var Line = require('./line');
-	/*
 	var Rectangle = require('./rectangle');
-	*/
 
 	function Mask(shapeList) {
 		var self = this;
@@ -424,11 +426,9 @@
 					case 'Line':
 						shapes.push(new Line(shape));
 						break;
-					/*
 					case 'Rectangle':
 						shapes.push(new Rectangle(shape));
 						break;
-					*/
 					default:
 						console.warn('Unknown shape: ' + shape.type);
 						break;
@@ -513,7 +513,7 @@
 	module.exports = Mask;
 })();
 
-},{"./line":3,"./polygon":9}],7:[function(require,module,exports){
+},{"./line":3,"./polygon":9,"./rectangle":10}],7:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -741,7 +741,142 @@
 	module.exports = Polygon;
 })();
 
-},{"./shape":10}],10:[function(require,module,exports){
+},{"./shape":12}],10:[function(require,module,exports){
+/* jshint node:true */
+/* globals angular */
+(function() {
+	'use strict';
+
+	var Shape = require('./shape');
+
+	function Rectangle(conf) {
+		/*
+		* Initialization
+		*/
+
+		var self = this;
+		var strokeColor = '#ffffff';
+		var fillColor = 'rgba(0, 0, 0, 0.3)';
+		Shape.call(self, conf);
+
+		/*
+		* Public methods
+		*/
+
+		self.draw = function(context) {
+			var savedColor = context.strokeStyle;
+			var savedFillColor = context.fillStyle;
+			context.strokeStyle = strokeColor;
+			context.fillStyle = fillColor;
+
+			var points = self.getPoints();
+			if(angular.isArray(points) && points.length === 2) {
+				var x = points[0].x;
+				var y = points[0].y;
+				var w = points[1].x - x;
+				var h = points[1].y - y;
+
+				context.fillRect(x, y, w, h);
+				context.strokeRect(x, y, w, h);
+				angular.forEach(points, function drawPoint(point) {
+					point.draw(context);
+				});
+			}
+
+			context.strokeStyle = savedColor;
+			context.fillStyle = savedFillColor;
+		};
+
+		return self;
+	}
+
+	Rectangle.prototype = Object.create(Shape.prototype);
+	Rectangle.prototype.constructor = Rectangle;
+
+	module.exports = Rectangle;
+})();
+
+},{"./shape":12}],11:[function(require,module,exports){
+/* jshint node:true */
+(function() {
+	'use strict';
+
+	var Point = require('./point');
+	var Rectangle = require('./rectangle');
+	var Control = require('./control');
+
+	function RectControl(scope, mask) {
+		var self = this;
+
+		/*
+		* Initialization
+		*/
+
+		Control.call(self, scope, mask);
+
+		/*
+		* Public methods
+		*/
+
+		self.init = function() {
+			var rectConf = {name:'Rectangle', type:'Rectangle', data:[]};
+			var rect = new Rectangle(rectConf);
+			self.getMask().addShape(rect);
+			self.getMask().setSelectedShape(rect);
+			console.log('rect init');
+		};
+
+		self.deinit = function() {
+			var shape = self.getMask().getSelectedShape();
+			var points = shape.getPoints();
+
+			if(points.length < 2) {
+				self.getMask().removeShape(shape);
+			}
+
+			// TODO: We should actually not even allow the creation of these points
+			if(points.length > 2) {
+				for(var i = 2; i < points.length; i++) {
+					shape.removePoint(points[i]);
+				}
+			}
+
+			self.getMask().setSelectedShape(null);
+			console.log('rect deinit');
+		};
+
+		// Called when dragging starts
+		self.startDrag = function(x, y) {
+			var point = new Point(x, y);
+			self.getMask().addPoint(point);
+			self.getMask().setSelectedPoint(point);
+			self.getMask().startDrag();
+			self.setDragging(true);
+			return true;
+		};
+
+		// Called when dragging stops
+		self.stopDrag = function(x, y) {
+			self.setDragging(false);
+			self.getMask().stopDrag(x, y);
+		};
+
+		// Called while dragging
+		self.drag = function(x, y) {
+			self.getMask().drag(x, y);
+		};
+
+		return self;
+	}
+
+	RectControl.prototype = Object.create(Control.prototype);
+	RectControl.prototype.constructor = RectControl;	
+
+	module.exports = RectControl;
+})();
+
+
+},{"./control":1,"./point":7,"./rectangle":10}],12:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {

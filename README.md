@@ -5,14 +5,14 @@ Directive to draw lines and paths and masks over an image.
 
 ##Progress
 
-Currently in version 0.0.0 with sort of proof of concept.
+Currently in version 0.0.1 with sort of proof of concept.
 
 
 ### Based on the *paths* object
 
 * [x] Draw lines on the canvas
 * [x] Draw polygons on the canvas
-* [ ] Draw rectangles on the canvas
+* [x] Draw rectangles on the canvas
 
 
 ### User interaction
@@ -59,8 +59,8 @@ like:
     data: [[30, 150], [610, 160]]
   },
   {
-    name: 'Wall',
-    type: 'Line',
+    name: 'Square',
+    type: 'Rectangle',
     data: [[150, 30], [160, 610]]
   },
   {
