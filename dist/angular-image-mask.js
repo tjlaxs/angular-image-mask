@@ -162,7 +162,7 @@
 	module.exports = Line;
 })();
 
-},{"./shape":10}],4:[function(require,module,exports){
+},{"./shape":11}],4:[function(require,module,exports){
 /* jshint node:true */
 (function() {
 	'use strict';
@@ -394,9 +394,7 @@
 
 	var Polygon = require('./polygon');
 	var Line = require('./line');
-	/*
 	var Rectangle = require('./rectangle');
-	*/
 
 	function Mask(shapeList) {
 		var self = this;
@@ -424,11 +422,9 @@
 					case 'Line':
 						shapes.push(new Line(shape));
 						break;
-					/*
 					case 'Rectangle':
 						shapes.push(new Rectangle(shape));
 						break;
-					*/
 					default:
 						console.warn('Unknown shape: ' + shape.type);
 						break;
@@ -513,7 +509,7 @@
 	module.exports = Mask;
 })();
 
-},{"./line":3,"./polygon":9}],7:[function(require,module,exports){
+},{"./line":3,"./polygon":9,"./rectangle":10}],7:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
@@ -741,7 +737,62 @@
 	module.exports = Polygon;
 })();
 
-},{"./shape":10}],10:[function(require,module,exports){
+},{"./shape":11}],10:[function(require,module,exports){
+/* jshint node:true */
+/* globals angular */
+(function() {
+	'use strict';
+
+	var Shape = require('./shape');
+
+	function Rectangle(conf) {
+		/*
+		* Initialization
+		*/
+
+		var self = this;
+		var strokeColor = '#ffffff';
+		var fillColor = 'rgba(0, 0, 0, 0.3)';
+		Shape.call(self, conf);
+
+		/*
+		* Public methods
+		*/
+
+		self.draw = function(context) {
+			var savedColor = context.strokeStyle;
+			var savedFillColor = context.fillStyle;
+			context.strokeStyle = strokeColor;
+			context.fillStyle = fillColor;
+
+			var points = self.getPoints();
+			if(angular.isArray(points) && points.length === 2) {
+				var x = points[0].x;
+				var y = points[0].y;
+				var w = points[1].x - x;
+				var h = points[1].y - y;
+
+				context.fillRect(x, y, w, h);
+				context.strokeRect(x, y, w, h);
+				angular.forEach(points, function drawPoint(point) {
+					point.draw(context);
+				});
+			}
+
+			context.strokeStyle = savedColor;
+			context.fillStyle = savedFillColor;
+		};
+
+		return self;
+	}
+
+	Rectangle.prototype = Object.create(Shape.prototype);
+	Rectangle.prototype.constructor = Rectangle;
+
+	module.exports = Rectangle;
+})();
+
+},{"./shape":11}],11:[function(require,module,exports){
 /* jshint node:true */
 /* globals angular */
 (function() {
