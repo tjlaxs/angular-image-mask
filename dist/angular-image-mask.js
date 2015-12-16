@@ -251,8 +251,29 @@
 
 	var aim = angular.module('tjlaxs.aim', []);
 
+	aim.controller('tjlAimController', ['$scope', function tjlAimController($scope) {
+		$scope.removeShape = function(shape) {
+			var shapes = $scope.config.shapes;
+			var index = shapes.indexOf(shape);
+			if(index !== -1) {
+				shapes.splice(index, 1);
+			}
+		};
+
+		$scope.removePoint = function(shape, point) {
+			var index = shape.data.indexOf(point);
+			if(index !== -1) {
+				shape.data.splice(index, 1);
+			}
+		};
+
+		$scope.test = function() {
+			console.log('it works');
+		};
+	}]);
+
 	aim.directive('tjlImageMask', function() {
-		function link(scope, element/*, attrs*/) {
+		function link(scope, element, attrs, aimController) {
 			var ctx = null;
 			var canvas = null;
 			var mask = null;
@@ -260,7 +281,7 @@
 			var mouseY = 0;
 			var dirScope = null;
 			var controller;
-	
+
 			function updateMouse(evt, element) {
 				var rect = element.getBoundingClientRect();
 				var scrollTop = document.documentElement.scrollTop ?
@@ -349,12 +370,15 @@
 				controller.init();
 			});
 
+			aimController.test();
+
 			canvas.addEventListener('mousedown', mouseDownListener, false);
 			canvas.addEventListener('mouseup', mouseUpListener, false);
 			draw();
 		}
 
 		var ret = {
+			require: '^^tjlAimController',
 			restrict: 'A',
 			link: link,
 			scope: {
@@ -366,14 +390,23 @@
 	});
 
 	aim.directive('tjlImageMaskControl', function() {
-		function link(scope) {
+		function link(scope, element, attrs, aimController) {
 			if(angular.isUndefined(scope.config.control.mode)) {
 				scope.config.mode = 'edit';
 			}
+
+			scope.removeShape = function(shape) {
+				aimController.removeShape(shape);
+			};
+
+			scope.removePoint = function(shape, point) {
+				aimController.removePoint(shape, point);
+			};
 		}
 
 		var ret = {
 			restrict: 'E',
+			require: '^tjlAimController',
 			link: link,
 			templateUrl: 'templates/image-mask.part.html',
 			scope: {

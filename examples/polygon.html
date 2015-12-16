@@ -128,14 +128,14 @@ input.coord {
 <body ng-controller="BasicController">
 
 <h1>Mask</h1>
-<div class="app-container">
-<div class="outerContainer">
-<div class="container">
-<img class="bgimg" alt="Camera feed" src="img/test.png" />
-<canvas class="cnvs" tjl-image-mask width="640" height="480" config="config"></canvas>
-</div>
-</div>
-<tjl-image-mask-control config="config" />
+<div tjl-aim-controller class="app-container">
+	<div class="outerContainer">
+		<div class="container">
+			<img class="bgimg" alt="Camera feed" src="img/test.png" />
+			<canvas class="cnvs" tjl-image-mask width="640" height="480" config="config"></canvas>
+		</div>
+	</div>
+	<tjl-image-mask-control config="config" />
 </div>
 
 <div><h2>Html</h2><pre>&lt;canvas class="cnvs" tjl-image-mask width="640" height="480" config="config"&gt;&lt;/canvas&gt;

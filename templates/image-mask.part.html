@@ -6,19 +6,18 @@
 			<input type="radio" ng-model="config.control.mode" value="line"> Line<br>
 			<input type="radio" ng-model="config.control.mode" value="rect"> Rectangle<br>
 			<input type="radio" ng-model="config.control.mode" value="poly"> Polygon
-
 		</fieldset>
 	
 		<fieldset>
 			<legend>Shapes</legend>
 			<div class="shape" ng-repeat="shape in config.shapes track by $index">
-				<input type="text" value="{{shape.name}}">
-				<button>Remove</button>
+				<input type="text" ng-model="shape.name">
+				<button ng-click="removeShape(shape)">Remove</button>
 				<div class="point" ng-repeat="point in shape.data track by $index">
 					<div class="flex coords">
 						<input class="coord" type="number" ng-model="point[0]">
 						<input class="coord" type="number" ng-model="point[1]">
-						<button>Remove</button>
+						<button ng-click="removePoint(shape, point)">Remove</button>
 					</div>
 				</div>
 			</div>

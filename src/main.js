@@ -11,8 +11,20 @@
 
 	var aim = angular.module('tjlaxs.aim', []);
 
+	function TjlCtcmProvider() {
+		var idToController = {};
+		this.put = function(id, controller) {
+			idToController[id] = controller;
+		};
+		this.get = function(id) {
+			return idToController[id];
+		};
+	}
+	var ctcmMapper = new TjlCtcmProvider();
+
 	aim.directive('tjlImageMask', function() {
-		function link(scope, element/*, attrs*/) {
+
+		function link(scope, element, attrs) {
 			var ctx = null;
 			var canvas = null;
 			var mask = null;
@@ -20,7 +32,9 @@
 			var mouseY = 0;
 			var dirScope = null;
 			var controller;
-	
+			var elementId = attrs.maskId;
+			ctcmMapper.put(elementId);
+
 			function updateMouse(evt, element) {
 				var rect = element.getBoundingClientRect();
 				var scrollTop = document.documentElement.scrollTop ?
@@ -114,9 +128,40 @@
 			draw();
 		}
 
+		var tjlImageMaskController = function($scope) {
+			$scope.removeShape = function(shape) {
+				var shapes = $scope.config.shapes;
+				var index = shapes.indexOf(shape);
+				if(index !== -1) {
+					shapes.splice(index, 1);
+				}
+			};
+			this.removeShape = function(shape) {
+				$scope.removeShape(shape);
+			};
+
+			$scope.removePoint = function(shape, point) {
+				var index = shape.data.indexOf(point);
+				if(index !== -1) {
+					shape.data.splice(index, 1);
+				}
+			};
+			this.removePoint = function(shape, point) {
+				$scope.removePoint(shape, point);
+			};
+
+			this.getConfigMode = function() {
+				return $scope.config.mode;
+			};
+			this.setConfigMode = function(mode) {
+				$scope.config.mode = mode;
+			};
+		};
+
 		var ret = {
 			restrict: 'A',
 			link: link,
+			controller: tjlImageMaskController,
 			scope: {
 				config: '='
 			}
@@ -126,10 +171,21 @@
 	});
 
 	aim.directive('tjlImageMaskControl', function() {
-		function link(scope) {
-			if(angular.isUndefined(scope.config.control.mode)) {
-				scope.config.mode = 'edit';
+		function link(scope, element, attrs) {
+			var elementId = attrs.maskId;
+			var aimController = ctcmMapper.get(elementId);
+
+			if(angular.isUndefined(aimController.getConfigMode())) {
+				aimController.setConfigMode('edit');
 			}
+
+			scope.removeShape = function(shape) {
+				aimController.removeShape(shape);
+			};
+
+			scope.removePoint = function(shape, point) {
+				aimController.removePoint(shape, point);
+			};
 		}
 
 		var ret = {
