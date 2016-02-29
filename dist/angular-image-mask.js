@@ -241,6 +241,7 @@
 
 
 },{"./control":1,"./line":3,"./point":7}],5:[function(require,module,exports){
+/* Angular-image-mask v0.0.4 */
 /* jshint node:true */
 /* globals angular */
 (function() {
