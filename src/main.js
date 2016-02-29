@@ -1,3 +1,4 @@
+/* Angular-image-mask v0.0.4 */
 /* jshint node:true */
 /* globals angular */
 (function() {
