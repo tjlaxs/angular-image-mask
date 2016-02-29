@@ -26,15 +26,18 @@
 			context.strokeStyle = strokeColor;
 
 			var points = self.getPoints();
-			if(angular.isArray(points) && points.length >= 2) {
-				context.beginPath();
-				context.moveTo(points[0].x, points[0].y);
-				context.lineTo(points[1].x, points[1].y);
-				context.stroke();
-				for(var i = 0; i < 2; i++) {
-					points[i].draw(context);
+			if(angular.isArray(points)) {
+				if(points.length === 2) {
+					context.beginPath();
+					context.moveTo(points[0].x, points[0].y);
+					context.lineTo(points[1].x, points[1].y);
+					context.stroke();
 				}
+				angular.forEach(points, function drawPoint(point) {
+					point.draw(context);
+				});
 			}
+
 
 			context.strokeStyle = savedColor;
 		};

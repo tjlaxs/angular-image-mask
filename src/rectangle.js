@@ -28,14 +28,16 @@
 			context.fillStyle = fillColor;
 
 			var points = self.getPoints();
-			if(angular.isArray(points) && points.length === 2) {
-				var x = points[0].x;
-				var y = points[0].y;
-				var w = points[1].x - x;
-				var h = points[1].y - y;
+			if(angular.isArray(points)) {
+				if(points.length === 2) {
+					var x = points[0].x;
+					var y = points[0].y;
+					var w = points[1].x - x;
+					var h = points[1].y - y;
 
-				context.fillRect(x, y, w, h);
-				context.strokeRect(x, y, w, h);
+					context.fillRect(x, y, w, h);
+					context.strokeRect(x, y, w, h);
+				}
 				angular.forEach(points, function drawPoint(point) {
 					point.draw(context);
 				});
